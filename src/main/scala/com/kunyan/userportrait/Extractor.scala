@@ -2,6 +2,7 @@ package com.kunyan.userportrait
 
 import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig, SparkConfig}
 import com.kunyan.userportrait.data.Analysis
+import com.kunyan.userportrait.platform.ZhiHu
 import com.kunyan.userportrait.util.FileUtil
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkContext, SparkConf}
