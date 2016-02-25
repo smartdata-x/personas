@@ -196,8 +196,4 @@ object Qzone extends  Platform {
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
     }
   }
-<<<<<<< HEAD
-=======
-
->>>>>>> 3bdd6d4a3ee9e6e49323475513a98bfbcfcd56cd
 }

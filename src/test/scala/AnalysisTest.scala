@@ -1,7 +1,9 @@
+import akka.dispatch.Filter
 import com.kunyan.userportrait.Extractor
 import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig}
 import com.kunyan.userportrait.data.Analysis
 import com.kunyan.userportrait.platform._
+import com.kunyan.userportrait.util.FileUtil
 import org.scalatest.{Matchers, FlatSpec}
 
 /**
@@ -15,10 +17,10 @@ class AnalysisTest  extends FlatSpec with Matchers{
 //    SuNing.urlListBuffer.foreach(x => println("suning:"+x))
 //  }
 
-//  it should "work " in {
-//    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000136_0",FileFormatConfig.tableName)
-//    Analysis.getAdAndUa(PlatformConfig.PLATFORM_SUNING)
-//  }
+  it should "work " in {
+    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000136_0",FileFormatConfig.tableName)
+    Analysis.getAdAndUa(PlatformConfig.PLATFORM_WEIBO)
+  }
 
 //  it should "work" in{
 //    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
@@ -26,12 +28,13 @@ class AnalysisTest  extends FlatSpec with Matchers{
 //    Eleme.urlListBuffer.foreach(x => println("ELEME:"+x))
 //  }
 
-  it should "work" in{
-    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
-    Analysis.getAdAndUaAndUrl(PlatformConfig.PLATFORM_QZONE).foreach(Qzone.QQzone(_))
-    Qzone.urlListBuffer.distinct.foreach(x => println("Qzone URL:"+x))
-    // Qzone.QQListBuffer.distinct.foreach(x => println("Qzone QQ:"+x))
-  }
+//  it should "work" in{
+//    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
+//    Analysis.getAdAndUaAndUrl(PlatformConfig.PLATFORM_QZONE).foreach(Qzone.QQzone(_))
+//    FileUtil.saveAdAndUaAndUrl(Qzone.urlListBuffer.distinct.toArray.++(Qzone.QQListBuffer.distinct) ,PlatformConfig.PLATFORM_QZONE)
+//
+//  }
+
 //
 //  it should "work" in{
 //    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
