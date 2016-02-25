@@ -8,6 +8,7 @@ import scala.collection.mutable.ListBuffer
 object SuNing extends  Platform {
   override val TOP_LEVEL_DOMAIN: String = "%.suning.com%"
   override val PLATFORM_NAME: String = "SuNing"
+<<<<<<< HEAD
   val urlListBuffer = new ListBuffer[String]
   //  个人信息
   def extractPersonalInfo(url:String): Boolean ={
@@ -37,4 +38,7 @@ object SuNing extends  Platform {
       exractAddress(url)
     }
   }
+=======
+
+>>>>>>> 747c622ba1b283c55521689f670f327a0a5da880
 }
