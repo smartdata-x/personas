@@ -3,7 +3,9 @@ package com.kunyan.userportrait.data
 import com.kunyan.userportrait.Extractor
 import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig}
 import com.kunyan.userportrait.platform.{PlatformScheduler, Eleme}
+import com.kunyan.userportrait.util.FileUtil
 import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SQLContext}
 
@@ -21,13 +23,14 @@ object Analysis {
     dataFrame.registerTempTable(tableName)
   }
 
-  def getAdAndUa: Unit ={
-    val result = sqlContext.sql("select distinct ad,ua from "+FileFormatConfig.tableName +" where url like '"  + PlatformScheduler.apply(PlatformConfig.PLATFORM_ELEME).TOP_LEVEL_DOMAIN +"' and cookies != 'NoDef'" ).map(x =>x(0)+"\t"+x(1)).collect()
-      .foreach(println)
+  def getAdAndUa(pType:Int): Unit ={
+    val result = sqlContext.sql("select distinct ad,ua,url,cookies from "+FileFormatConfig.tableName +" where url like '"  + PlatformScheduler.apply(pType).TOP_LEVEL_DOMAIN +"' and cookies != 'NoDef' and ua != 'NoDef'" ).map(x =>x(0)+"\t"+x(1)+"\t"+x(2)+"\t"+x(3)).collect()
+      //.foreach(println)
+    FileUtil.saveAdAndUaAndUrl(result,pType)
   }
 
-  def getAdAndUaAndUrl(pType:Int): Array[String] ={
-    val result = sqlContext.sql("select distinct org.ad,org.ua,org.url from "+FileFormatConfig.tableName + " org join ( select distinct ad,ua from "+FileFormatConfig.tableName +" where url like '"  + PlatformScheduler.apply(pType).TOP_LEVEL_DOMAIN +" and cookies != 'NoDef') tmp on (tmp.ad = org.ad and tmp.ua = org.ua)" ).map(x =>x(0)+"\t"+x(1)+"\t"+x(2)).collect()
+  def getAdAndUaAndUrl(pType:Int): RDD[String] ={
+    val result = sqlContext.sql("select distinct org.ad,org.ua,org.url from "+FileFormatConfig.tableName + " org join ( select distinct ad,ua from "+FileFormatConfig.tableName +" where url like '"  + PlatformScheduler.apply(pType).TOP_LEVEL_DOMAIN +"' and cookies != 'NoDef' and ua != 'NoDef') tmp on (tmp.ad = org.ad and tmp.ua = org.ua)" ).map(x =>x(0)+"\t"+x(1)+"\t"+x(2))
     result
   }
 }
