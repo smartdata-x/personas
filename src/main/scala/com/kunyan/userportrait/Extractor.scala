@@ -39,6 +39,7 @@ object Extractor {
     weibo.foreach(WeiBo.WeiBo(_))
     FileUtil.saveAdAndUaAndUrl(WeiBo.urlListBuffer.distinct.toArray,PlatformConfig.PLATFORM_WEIBO,2)
     // suning.com
+
     val suning  = Analysis.getAdAndUaAndUrl(PlatformConfig.PLATFORM_SUNING)
     suning.foreach(SuNing.extract(_))
     FileUtil.saveAdAndUaAndUrl(SuNing.urlListBuffer.distinct.toArray,PlatformConfig.PLATFORM_SUNING,2)
