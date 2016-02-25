@@ -191,9 +191,13 @@ object Qzone extends  Platform {
     }else if(Dress(url)){
       urlListBuffer.+=(line)
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
-    }else{
+    }else if(InterSpace(url)){
       urlListBuffer.+=(line)
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
     }
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3bdd6d4a3ee9e6e49323475513a98bfbcfcd56cd
 }
