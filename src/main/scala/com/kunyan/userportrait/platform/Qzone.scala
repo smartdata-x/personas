@@ -188,7 +188,7 @@ object Qzone extends  Platform {
     }else if(Application(url)){
       urlListBuffer.+=(line)
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
-    }else if( Dress(url)){
+    }else if(Dress(url)){
       urlListBuffer.+=(line)
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
     }else{
@@ -196,8 +196,4 @@ object Qzone extends  Platform {
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
     }
   }
-
-
-
-
-  }
+}
