@@ -6,8 +6,10 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object WeiBo extends  Platform {
-  override val PLATFORM_NAME: String = "WeiBo"
+  override val PLATFORM_NAME_INFO: String = "WeiBo"
   override val TOP_LEVEL_DOMAIN: String = "%weibo.com%"
+  override val PLATFORM_NAME_HTTP: String = "WeiBoHttp"
+
   val urlListBuffer = new ListBuffer[String]()
   val WeiBoListBuffer = new ListBuffer[String]()
   var QQ = new String
@@ -71,6 +73,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   //QQ号匹配
   def QQ(url:String):Boolean={
     var flag = false

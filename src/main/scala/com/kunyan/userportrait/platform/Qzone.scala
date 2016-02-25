@@ -7,7 +7,8 @@ import scala.collection.mutable.ListBuffer
   */
 object Qzone extends  Platform {
   override val TOP_LEVEL_DOMAIN: String = "%.qq.com%"
-  override val PLATFORM_NAME: String = "QQ"
+  override val PLATFORM_NAME_HTTP: String = "QQHttp"
+  override val PLATFORM_NAME_INFO: String = "QQ"
   val urlListBuffer = new ListBuffer[String]()
   val QQListBuffer = new ListBuffer[String]()
   var QQ = new String
@@ -163,38 +164,37 @@ object Qzone extends  Platform {
     val url = lineSplit(2)
     if(PersonCenter(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(HomePage(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(PhotoAlbum(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
   }else if(MessageBoard(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(Time(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(More(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(PersonalFile(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(Friend(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ +"@qq.com")
     }else if(Application(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
-    }else if( Dress(url)){
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ  +"@qq.com")
+    }else if(Dress(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ  +"@qq.com")
     }else if(InterSpace(url)){
       urlListBuffer.+=(line)
-      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ)
+      QQListBuffer. += (ad +"\t"+ua+"\t"+QQ  +"@qq.com")
     }
   }
-
 }

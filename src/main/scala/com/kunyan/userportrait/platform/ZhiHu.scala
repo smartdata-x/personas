@@ -6,8 +6,10 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object ZhiHu extends  Platform{
-  override val PLATFORM_NAME: String = "ZhiHu"
+  override val PLATFORM_NAME_INFO: String = "ZhiHu"
   override val TOP_LEVEL_DOMAIN: String = "%.zhihu.com%"
+  override val PLATFORM_NAME_HTTP: String = "ZhiHuHttp"
+
   val urlListBuffer = new ListBuffer[String]()
 
   // 主页
@@ -15,12 +17,10 @@ object ZhiHu extends  Platform{
     var flag = false
     val templet = "http://www.zhihu.com/people"
     if(url.contains(templet)){
-      urlListBuffer.+=(url)
       flag = true
     }
     val templetDomain = "http://www.zhihu.com/"
     if(url == templetDomain){
-      urlListBuffer.+=(url)
       flag = true
     }
     flag
@@ -36,7 +36,6 @@ object ZhiHu extends  Platform{
     val templetTwo = "http://www.zhihu.com/topic/\\d{1,}".r
     val result  = templetTwo.findAllMatchIn(url)
     result.foreach(x => {
-      urlListBuffer.+=(url)
       flag = true
       // println(url)
     })
@@ -49,26 +48,25 @@ object ZhiHu extends  Platform{
     val answer = "http://www.zhihu.com/question/\\d{1,}/answer/\\d{1,}".r
     val result  = answer.findAllMatchIn(url)
     result.foreach(x => {
-      urlListBuffer.+=(url)
       flag = true
       // println(url)
     })
     val questionResult  = question.findAllMatchIn(url)
     questionResult.foreach(x => {
-      urlListBuffer.+=(url)
       flag  = true
       // println(url)
     })
     flag
   }
 
-  def extract(url:String): Unit ={
+  def extract(line:String): Unit ={
+    val url = line.split("\t")(2)
     if(extractHomePage(url)){
-      ;
+      urlListBuffer.+=(line)
     }else if(extractTopic(url)){
-      ;
-    }else{
-      extractQuestionAndAnwer(url)
+      urlListBuffer.+=(line)
+    }else if(extractQuestionAndAnwer(url)){
+      urlListBuffer.+=(line)
     }
   }
 

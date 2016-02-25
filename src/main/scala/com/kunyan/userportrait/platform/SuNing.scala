@@ -7,15 +7,14 @@ import scala.collection.mutable.ListBuffer
   */
 object SuNing extends  Platform {
   override val TOP_LEVEL_DOMAIN: String = "%.suning.com%"
-  override val PLATFORM_NAME: String = "SuNing"
-<<<<<<< HEAD
+  override val PLATFORM_NAME_INFO: String = "SuNing"
+  override val PLATFORM_NAME_HTTP: String = "SuNingHttp"
   val urlListBuffer = new ListBuffer[String]
   //  个人信息
   def extractPersonalInfo(url:String): Boolean ={
     var flag = false
     val templet = "http://my.suning.com/person.do"
     if(url.contains(templet)){
-      urlListBuffer.+=(url)
       flag  = true
     }
     flag
@@ -25,20 +24,18 @@ object SuNing extends  Platform {
     var flag = false
     val templet = "http://my.suning.com/address.do"
     if(url.contains(templet)){
-      urlListBuffer.+=(url)
       flag  = true
     }
     flag
   }
 
-  def extract(url:String): Unit ={
+  def extract(line:String): Unit ={
+    val url = line.split("\t")(2)
     if(extractPersonalInfo(url)){
-      ;
-    }else{
-      exractAddress(url)
+      urlListBuffer.+=(line)
+    }else if(exractAddress(url)){
+      urlListBuffer.+=(line)
     }
   }
-=======
 
->>>>>>> 747c622ba1b283c55521689f670f327a0a5da880
 }

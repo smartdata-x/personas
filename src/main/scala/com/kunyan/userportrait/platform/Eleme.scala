@@ -8,14 +8,14 @@ import scala.collection.mutable.ListBuffer
 object Eleme extends  Platform{
 
   override val TOP_LEVEL_DOMAIN = "%www.ele.me%"
-  override val PLATFORM_NAME = "Eleme"
+  override val PLATFORM_NAME_INFO = "Eleme"
+  override val PLATFORM_NAME_HTTP: String = "ElemeHttp"
   val urlListBuffer = new ListBuffer[String]()
   // home
   def extractHmomePage(url:String): Boolean ={
     var flag = false
     val templet = "http://www.ele.me/"
     if(url == templet){
-      urlListBuffer.+=(url)
       flag = true
     }
     flag
@@ -27,7 +27,6 @@ object Eleme extends  Platform{
     val templet = "http://www.ele.me/shop/\\d{1,}".r
     val result  = templet.findAllMatchIn(url)
     result.foreach(x => {
-      urlListBuffer.+=(url)
       flag = true
       // println(url)
     })
@@ -39,7 +38,6 @@ object Eleme extends  Platform{
     var flag = false
     val templet = "https://www.ele.me/profile/info"
     if(url.contains(templet)){
-      urlListBuffer.+=(url)
       flag = true
 
     }
@@ -51,18 +49,18 @@ object Eleme extends  Platform{
     var flag = false
     val templet = "http://www.ele.me/profile/address"
     if(url.contains(templet)){
-      urlListBuffer.+=(url)
       flag  = true
     }
     flag
   }
-  def extract(url:String): Unit ={
+  def extract(line:String): Unit ={
+    val url = line.split("\t")(2)
     if(extractHmomePage(url)){
-      ;
+      urlListBuffer.+=(line)
     }else if(extractShop(url)){
-      ;
-    }else{
-      extractAddress(url)
+      urlListBuffer.+=(line)
+    }else if(extractAddress(url)){
+      urlListBuffer.+=(line)
     }
   }
 }

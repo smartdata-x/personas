@@ -1,4 +1,4 @@
-import com.kunyan.userportrait.platform.ZhiHu
+
 import org.scalatest.{Matchers, FlatSpec}
 
 /**

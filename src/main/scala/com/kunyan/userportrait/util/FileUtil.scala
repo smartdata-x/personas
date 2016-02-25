@@ -55,12 +55,18 @@ object FileUtil {
     * @param array
     * @param pType
     */
-  def saveAdAndUaAndUrl(array:Array[String], pType:Int): Unit ={
+  def saveAdAndUaAndUrl(array:Array[String], pType:Int,dType:Int): Unit ={
     val dateStr = TimeUtil.getDay
-    val destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME
-    val dateDir = destPath + "/" + dateStr
-    mkDir(dateDir)
-    createFile(dateDir +"/"+TimeUtil.getCurrentHour,array)
+    var filter = array
+    var destPath = ""
+    if(dType == 1){
+      destPath= FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_INFO +"/" + dateStr
+    }else{
+      destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_HTTP +"/" + dateStr
+      filter = array.filter(_.split("\t")(3) != "NoDef").toList.toArray
+    }
+    mkDir(destPath)
+    createFile(destPath +"/"+TimeUtil.getCurrentHour,filter)
   }
 
 }

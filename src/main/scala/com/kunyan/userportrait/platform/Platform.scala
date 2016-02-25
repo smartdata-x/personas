@@ -5,5 +5,6 @@ package com.kunyan.userportrait.platform
   */
 class Platform {
   val TOP_LEVEL_DOMAIN = new String
-  val  PLATFORM_NAME = new String
+  val  PLATFORM_NAME_INFO = new String
+  val  PLATFORM_NAME_HTTP = new String
 }
