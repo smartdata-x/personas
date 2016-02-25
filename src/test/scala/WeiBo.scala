@@ -1,4 +1,4 @@
-import com.kunyan.userportrait.platform.{WeiBo, ZhiHu}
+
 import org.scalatest.{Matchers, FlatSpec}
 
 /**

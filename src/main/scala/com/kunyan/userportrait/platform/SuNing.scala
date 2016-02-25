@@ -7,8 +7,8 @@ import scala.collection.mutable.ListBuffer
   */
 object SuNing extends  Platform {
   override val TOP_LEVEL_DOMAIN: String = "%.suning.com%"
-  override val PLATFORM_NAME: String = "SuNing"
-
+  override val PLATFORM_NAME_INFO: String = "SuNing"
+  override val PLATFORM_NAME_HTTP: String = "SuNingHttp"
   val urlListBuffer = new ListBuffer[String]
   //  个人信息
   def extractPersonalInfo(url:String): Boolean ={

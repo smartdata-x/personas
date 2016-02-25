@@ -6,8 +6,10 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object ZhiHu extends  Platform{
-  override val PLATFORM_NAME: String = "ZhiHu"
+  override val PLATFORM_NAME_INFO: String = "ZhiHu"
   override val TOP_LEVEL_DOMAIN: String = "%.zhihu.com%"
+  override val PLATFORM_NAME_HTTP: String = "ZhiHuHttp"
+
   val urlListBuffer = new ListBuffer[String]()
 
   // 主页

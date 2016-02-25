@@ -8,7 +8,8 @@ import scala.collection.mutable.ListBuffer
 object Eleme extends  Platform{
 
   override val TOP_LEVEL_DOMAIN = "%www.ele.me%"
-  override val PLATFORM_NAME = "Eleme"
+  override val PLATFORM_NAME_INFO = "Eleme"
+  override val PLATFORM_NAME_HTTP: String = "ElemeHttp"
   val urlListBuffer = new ListBuffer[String]()
   // home
   def extractHmomePage(url:String): Boolean ={
@@ -53,7 +54,7 @@ object Eleme extends  Platform{
     flag
   }
   def extract(line:String): Unit ={
-    val url = line.split("\t")(0)
+    val url = line.split("\t")(2)
     if(extractHmomePage(url)){
       urlListBuffer.+=(line)
     }else if(extractShop(url)){

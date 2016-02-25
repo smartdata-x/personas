@@ -1,5 +1,5 @@
 
-import com.kunyan.userportrait.platform.ZhiHu
+
 import org.scalatest.{Matchers, FlatSpec}
 
 
@@ -8,7 +8,7 @@ import org.scalatest.{Matchers, FlatSpec}
   */
 class ZhiHu extends FlatSpec with Matchers{
   it should "work" in {
-    ZhiHu.extractQuestionAndAnwer("http://www.zhihu.com/question/")
+
   }
 }
 

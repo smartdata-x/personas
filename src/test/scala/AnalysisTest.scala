@@ -17,10 +17,10 @@ class AnalysisTest  extends FlatSpec with Matchers{
 //    SuNing.urlListBuffer.foreach(x => println("suning:"+x))
 //  }
 
-  it should "work " in {
-    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000136_0",FileFormatConfig.tableName)
-    Analysis.getAdAndUa(PlatformConfig.PLATFORM_WEIBO)
-  }
+//  it should "work " in {
+//    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000136_0",FileFormatConfig.tableName)
+//    Analysis.getAdAndUa(PlatformConfig.PLATFORM_WEIBO)
+//  }
 
 //  it should "work" in{
 //    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
@@ -38,8 +38,8 @@ class AnalysisTest  extends FlatSpec with Matchers{
 //
 //  it should "work" in{
 //    Analysis.loadData(Extractor.sc,"F:\\datatest\\data\\000095_0",FileFormatConfig.tableName)
-//    Analysis.getAdAndUaAndUrl(PlatformConfig.PLATFORM_WEIBO).foreach(WeiBo.extract(_))
-//    WeiBo.urlListBuffer.foreach(x => println("WeiBo:"+x))
+//    Analysis.getAdAndUaAndUrl(PlatformConfig.PLATFORM_WEIBO).foreach(WeiBo.WeiBo(_))
+//    FileUtil.saveAdAndUaAndUrl(WeiBo.urlListBuffer.distinct.toArray,PlatformConfig.PLATFORM_WEIBO)
 //  }
 
 //  it should "work" in{
