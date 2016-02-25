@@ -6,4 +6,5 @@ package com.kunyan.userportrait.platform
 object SuNing extends  Platform {
   override val TOP_LEVEL_DOMAIN: String = "%.suning.com%"
   override val PLATFORM_NAME: String = "SuNing"
+
 }
