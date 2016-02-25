@@ -48,7 +48,7 @@ object Extractor {
     FileUtil.saveAdAndUaAndUrl(Qzone.urlListBuffer.distinct.toArray ,PlatformConfig.PLATFORM_QZONE,2)
     FileUtil.saveAdAndUaAndUrl(Qzone.QQListBuffer.distinct.toArray ,PlatformConfig.PLATFORM_QZONE,1)
     sc.stop()
-    
+
   }
 
 
