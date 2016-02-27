@@ -1,4 +1,4 @@
-package com.kunyan.userportrait.platform
+package com.kunyan.userportrait.rule.url
 
 /**
   * Created by C.J.YOU on 2016/2/24.
@@ -7,7 +7,7 @@ object PlatformScheduler {
 
   def apply(pType:Int): Platform ={
     if(pType == 1){
-      Eleme
+      EleMe
     }else if(pType == 2){
       Qzone
     }else if(pType == 3){

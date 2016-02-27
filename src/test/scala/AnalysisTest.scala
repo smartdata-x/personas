@@ -1,10 +1,4 @@
-import akka.dispatch.Filter
-import com.kunyan.userportrait.Extractor
-import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig}
-import com.kunyan.userportrait.data.Analysis
-import com.kunyan.userportrait.platform._
-import com.kunyan.userportrait.util.FileUtil
-import org.scalatest.{Matchers, FlatSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
 /**
   * Created by C.J.YOU on 2016/2/25.

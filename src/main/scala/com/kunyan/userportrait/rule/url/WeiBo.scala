@@ -1,4 +1,4 @@
-package com.kunyan.userportrait.platform
+package com.kunyan.userportrait.rule.url
 
 import scala.collection.mutable.ListBuffer
 
@@ -6,6 +6,7 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object WeiBo extends  Platform {
+
   override val PLATFORM_NAME_INFO: String = "WeiBo"
   override val TOP_LEVEL_DOMAIN: String = "%weibo.com%"
   override val PLATFORM_NAME_HTTP: String = "WeiBoHttp"
@@ -13,6 +14,7 @@ object WeiBo extends  Platform {
   val urlListBuffer = new ListBuffer[String]()
   val WeiBoListBuffer = new ListBuffer[String]()
   var QQ = new String
+
   //主页
   def HomePage(url:String):Boolean={
     var flag = false
@@ -23,6 +25,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   //相册
   def PhotoAlbum(url:String):Boolean={
     var flag = false
@@ -33,6 +36,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   //管理
   def Manage(url:String):Boolean={
     var flag = false
@@ -53,6 +57,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   //发现
   def Found(url:String):Boolean={
     var flag = false
@@ -63,6 +68,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   //个人信息
   def PersonInformation(url:String):Boolean={
     var flag = false
@@ -85,6 +91,7 @@ object WeiBo extends  Platform {
     })
     flag
   }
+
   def WeiBo(line:String): Unit ={
     val  lineSplit = line.split("\t")
     val ad = lineSplit(0)
@@ -108,6 +115,5 @@ object WeiBo extends  Platform {
       WeiBoListBuffer. += (ad +"\t"+ua+"\t"+QQ)
     }
   }
-
 
 }

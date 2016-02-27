@@ -1,4 +1,4 @@
-package com.kunyan.userportrait.platform
+package com.kunyan.userportrait.rule.url
 
 import scala.collection.mutable.ListBuffer
 
@@ -6,10 +6,12 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object SuNing extends  Platform {
+
   override val TOP_LEVEL_DOMAIN: String = "%.suning.com%"
   override val PLATFORM_NAME_INFO: String = "SuNing"
   override val PLATFORM_NAME_HTTP: String = "SuNingHttp"
   val urlListBuffer = new ListBuffer[String]
+
   //  个人信息
   def extractPersonalInfo(url:String): Boolean ={
     var flag = false
@@ -19,6 +21,7 @@ object SuNing extends  Platform {
     }
     flag
   }
+
   // address
   def exractAddress(url:String): Boolean ={
     var flag = false

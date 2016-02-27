@@ -1,3 +1,5 @@
+mainClass in (Compile, packageBin) := Some("com.kunyan.userportrait.scheduler.Scheduler")
+
 name := "userportrait"
 
 version := "1.0"
@@ -12,9 +14,11 @@ libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.7.1" % "provid
 
 libraryDependencies += "org.apache.commons" % "commons-lang3" % "3.4" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
 
-libraryDependencies += "org.apache.spark" % "spark-core_2.10" % "1.5.2" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
+libraryDependencies += "org.apache.spark" % "spark-core_2.10" % "1.5.2" excludeAll ExclusionRule(organization = "javax.servlet")
 
 libraryDependencies += "org.apache.spark" % "spark-sql_2.10" % "1.5.2" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
+
+libraryDependencies += "org.apache.kafka" % "kafka_2.10" % "0.8.2.1"
 
 libraryDependencies += "org.scalactic" %% "scalactic" % "2.2.5" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
 

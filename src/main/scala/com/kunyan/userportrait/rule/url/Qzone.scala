@@ -1,4 +1,4 @@
-package com.kunyan.userportrait.platform
+package com.kunyan.userportrait.rule.url
 
 import scala.collection.mutable.ListBuffer
 
@@ -6,12 +6,14 @@ import scala.collection.mutable.ListBuffer
   * Created by C.J.YOU on 2016/2/24.
   */
 object Qzone extends  Platform {
+
   override val TOP_LEVEL_DOMAIN: String = "%.qq.com%"
   override val PLATFORM_NAME_HTTP: String = "QQHttp"
   override val PLATFORM_NAME_INFO: String = "QQ"
   val urlListBuffer = new ListBuffer[String]()
   val QQListBuffer = new ListBuffer[String]()
   var QQ = new String
+
   //个人中心
   def PersonCenter(url:String):Boolean={
     var flag = false
@@ -36,6 +38,7 @@ object Qzone extends  Platform {
     }
     flag
   }
+
   //主页
   def HomePage(url:String):Boolean={
     var flag = false
@@ -48,6 +51,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //相册
   def PhotoAlbum(url:String):Boolean={
     var flag = false
@@ -60,6 +64,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //留言板
   def MessageBoard(url:String):Boolean={
     var flag = false
@@ -72,6 +77,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //时光轴
   def Time(url:String):Boolean={
     var flag = false
@@ -84,6 +90,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //更多
   def More(url:String):Boolean={
     var flag = false
@@ -96,6 +103,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //个人档
   def PersonalFile(url:String):Boolean={
     var flag = false
@@ -108,6 +116,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //好友
   def Friend(url:String):Boolean={
     var flag = false
@@ -120,6 +129,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //应用
   def Application (url:String):Boolean={
     var flag = false
@@ -132,6 +142,7 @@ object Qzone extends  Platform {
     })
     flag
   }
+
   //装扮
   def Dress (url:String):Boolean= {
     var flag = false
@@ -144,17 +155,18 @@ object Qzone extends  Platform {
     })
     flag
   }
-    //空间设置
-    def InterSpace (url:String):Boolean={
-      var flag = false
-      val inerspace  = "http://user.qzone.qq.com/\\d{1,}/profile/permit".r
-      val result  =  inerspace .findAllMatchIn(url)
-      result.foreach(x => {
-        val QQzone = url.split("/")(3)
-        flag =true
-        QQ = QQzone
-      })
-      flag
+
+  //空间设置
+  def InterSpace (url:String):Boolean={
+    var flag = false
+    val inerspace  = "http://user.qzone.qq.com/\\d{1,}/profile/permit".r
+    val result  =  inerspace .findAllMatchIn(url)
+    result.foreach(x => {
+      val QQzone = url.split("/")(3)
+      flag =true
+      QQ = QQzone
+    })
+    flag
   }
 
   def QQzone(line:String): Unit ={
@@ -197,4 +209,5 @@ object Qzone extends  Platform {
       QQListBuffer. += (ad +"\t"+ua+"\t"+QQ  +"@qq.com")
     }
   }
+
 }
