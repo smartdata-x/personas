@@ -6,6 +6,8 @@ version := "1.0"
 
 scalaVersion := "2.10.4"
 
+resolvers += "Kunyan Repo" at "http://222.73.34.92:8081/nexus/content/groups/public/"
+
 libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.10.4" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.1" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
@@ -26,6 +28,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 
 libraryDependencies += "org.datanucleus" % "datanucleus-core" % "3.2.10"
 
+libraryDependencies += "org.slf4j" % "slf4j-log4j12" % "1.7.6"
 
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last

@@ -4,6 +4,7 @@ import java.io._
 
 import com.kunyan.userportrait.config.FileConfig
 import com.kunyan.userportrait.rule.url.PlatformScheduler
+import sun.misc.BASE64Decoder
 
 import scala.collection.mutable.ListBuffer
 
@@ -50,7 +51,7 @@ object FileUtil {
 
   /**
     * 保存AD,UA,URL
- *
+    *
     * @author C.J.YOU
     * @param array
     * @param pType

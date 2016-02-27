@@ -2,6 +2,7 @@ package com.kunyan.userportrait.scheduler
 
 import java.util.Properties
 
+import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -18,21 +19,27 @@ object Scheduler {
   val producer = new Producer[String, String](config)
 
   def main(args: Array[String]): Unit = {
-    val sparkConf = new SparkConf().setAppName("USER PORTRAIT").setMaster("local")
+
+    if (args.length != 2)
+      println("lack of parameters")
+
+    val sparkConf = new SparkConf().setAppName("USER PORTRAIT")
     val sc = new SparkContext(sparkConf)
 
     val source = args(0)
 
-    val result = sc.textFile(source).map(x => x.split("\t"))
+    sc.textFile(source).map(x => x.split("\t"))
       .filter(_.length == 5)
       .filter(_(4) != "NoDef")
-      .filter(_(3).contains("http://www.ele.me/"))
+      .filter(_(3).contains("ele.me/"))
+      .filter(!_(3).contains("favicon.ico"))
+      .map(toJson)
+      .saveAsTextFile(args(1))
 
-    result.foreach(x => {
-      val json = toJson(x)
-      val message = new KeyedMessage[String, String]("user", toJson(x))
+    /*result.foreach(x => {
+      val message = new KeyedMessage[String, String](args(1), toJson(x))
       producer.send(message)
-    })
+    })*/
 
     sc.stop()
   }
@@ -41,7 +48,7 @@ object Scheduler {
 
 
   def toJson(arr: Array[String]): String = {
-    val json = "{\"ua\":%s, \"ad\":%s, \"url\":%d, \"cookie\":%d, \"platform\":%s\"}"
+    val json = "{\"ua\":\"%s\", \"ad\":\"%s\", \"url\":\"%s\", \"cookie\":\"%s\", \"platform\":\"%s\"}"
     json.format(arr(1), arr(2), arr(3), arr(4), "eleme")
   }
 
