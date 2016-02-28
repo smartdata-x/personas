@@ -1,3 +1,5 @@
+package com.kunyan.userportrait.rule.url
+
 import org.scalatest.{FlatSpec, Matchers}
 
 /**
