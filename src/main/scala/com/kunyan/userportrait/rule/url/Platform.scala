@@ -1,4 +1,4 @@
-package com.kunyan.userportrait.platform
+package com.kunyan.userportrait.rule.url
 
 /**
   * Created by C.J.YOU on 2016/2/24.
