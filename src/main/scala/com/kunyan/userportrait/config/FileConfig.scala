@@ -5,7 +5,8 @@ package com.kunyan.userportrait.config
   */
 object FileConfig {
 
-  val ROOT_DIR = "/home/telecom"
+  val ROOT_DIR = "f:/home/telecom"
+
   val USER_DATA = ROOT_DIR + "/User_Data"
 
 }

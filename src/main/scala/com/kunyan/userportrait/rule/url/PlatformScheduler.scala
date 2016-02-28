@@ -14,8 +14,10 @@ object PlatformScheduler {
       ZhiHu
     }else if(pType == 4){
       WeiBo
-    }else{
+    }else if(pType == 5){
       SuNing
+    }else{
+      new Platform
     }
   }
 }
