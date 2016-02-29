@@ -5,6 +5,8 @@ package com.kunyan.userportrait.rule.url
   */
 class Platform {
   val TOP_LEVEL_DOMAIN = new String
-  val  PLATFORM_NAME_INFO = new String
-  val  PLATFORM_NAME_HTTP = new String
+  val PLATFORM_NAME_HTTP = "Http_Info"
+  val PLATFORM_NAME_INFO = "User_Info"
+
+
 }

@@ -15,62 +15,12 @@ object ZhiHu extends  Platform{
 
   // 主页
   def extractHomePage(url:String): Boolean ={
-    var flag = false
-    val templet = "http://www.zhihu.com/people"
-    if(url.contains(templet)){
-      flag = true
-    }
-    val templetDomain = "http://www.zhihu.com/"
-    if(url == templetDomain){
-      flag = true
-    }
-    flag
+    url.contains("http://www.zhihu.com/people") || (url == "http://www.zhihu.com/")
   }
 
-  // 话题
-  def extractTopic(url:String): Boolean ={
-    var flag = false
-    val templet = "http://www.zhihu.com/topic"
-    if(url == templet){
-      urlListBuffer.+=(url)
-      flag = true
-    }
-    val templetTwo = "http://www.zhihu.com/topic/\\d{1,}".r
-    val result  = templetTwo.findAllMatchIn(url)
-    result.foreach(x => {
-      flag = true
-      // println(url)
-    })
-    flag
-  }
-
-  // 提问与回答
-  def extractQuestionAndAnwer(url:String):Boolean={
-    var flag = false
-    val question = "http://www.zhihu.com/question/".r
-    val answer = "http://www.zhihu.com/question/\\d{1,}/answer/\\d{1,}".r
-    val result  = answer.findAllMatchIn(url)
-    result.foreach(x => {
-      flag = true
-      // println(url)
-    })
-    val questionResult  = question.findAllMatchIn(url)
-    questionResult.foreach(x => {
-      flag  = true
-      // println(url)
-    })
-    flag
-  }
-
-  def extract(line:String): Unit ={
+  def getUrl(line:String): String ={
     val url = line.split("\t")(2)
-    if(extractHomePage(url)){
-      urlListBuffer.+=(line)
-    }else if(extractTopic(url)){
-      urlListBuffer.+=(line)
-    }else if(extractQuestionAndAnwer(url)){
-      urlListBuffer.+=(line)
-    }
+    if(extractHomePage(url)) url else "NoDef"
   }
 
 }

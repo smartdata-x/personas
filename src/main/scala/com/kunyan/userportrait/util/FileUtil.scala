@@ -4,7 +4,6 @@ import java.io._
 
 import com.kunyan.userportrait.config.FileConfig
 import com.kunyan.userportrait.rule.url.PlatformScheduler
-import sun.misc.BASE64Decoder
 
 import scala.collection.mutable.ListBuffer
 
@@ -51,20 +50,16 @@ object FileUtil {
 
   /**
     * 保存AD,UA,URL
-    *
-    * @author C.J.YOU
-    * @param array
-    * @param pType
     */
   def saveAdAndUaAndUrl(array:Array[String], pType:Int,dType:Int): Unit ={
     val dateStr = TimeUtil.getDay
     var filter = array
     var destPath = ""
     if(dType == 1){
-      destPath= FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_INFO +"/" + dateStr
-    }else{
-      destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_HTTP +"/" + dateStr
-      filter = array.filter(_.split("\t")(3) != "NoDef").toList.toArray
+      destPath= FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_HTTP +"/" + dateStr
+    }else if(dType == 2){
+      destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_INFO +"/" + dateStr
+      filter = array
     }
     mkDir(destPath)
     createFile(destPath +"/"+TimeUtil.getCurrentHour,filter)
