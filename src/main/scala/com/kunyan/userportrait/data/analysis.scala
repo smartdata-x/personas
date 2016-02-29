@@ -1,8 +1,10 @@
 package com.kunyan.userportrait.data
 
 import com.kunyan.userportrait.Extractor
-import com.kunyan.userportrait.config.FileFormatConfig
+import com.kunyan.userportrait.Test.Test
+import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig}
 import com.kunyan.userportrait.rule.url.PlatformScheduler
+import com.kunyan.userportrait.util.FileUtil
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
@@ -12,7 +14,8 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
   */
 object Analysis {
 
-  val sqlContext = Extractor.sqlContext
+ // val sqlContext = Extractor.sqlContext
+  val sqlContext = Test.sqlContext
 
   def createDataTable(dataFile: RDD[String], tableName:String):Unit ={
     val schemaFormat = StructType(FileFormatConfig.schemaString.split(" ").map(fieldName => StructField(fieldName, StringType, nullable = true)))

@@ -12,15 +12,29 @@ object Qzone extends  Platform {
   override val PLATFORM_NAME_INFO: String = "QQ"
 
   def getQQFromCookies(cookies:String):String = {
+    val QQNumberSet = new scala.collection.mutable.HashSet[String]()
     var QQNumber = ""
     if (cookies != "NoDef") {
       val result = StringUtil.decodeBase64(cookies)
       val template = "(?<=qzone_check=)\\d{1,}(?=_)".r
-      val resultPhone  =  template.findAllMatchIn(result)
-      resultPhone.foreach(x => {
+      val resultQQ  =  template.findAllMatchIn(result)
+      resultQQ.foreach(x => {
         QQNumber = x.toString()
       })
+      if(!"".equals(QQNumber)){
+        QQNumberSet.+=(QQNumber)
+      }
+
+      val templateOcookie = "(?<=o_cookie=)\\d{1,}(?=)".r
+      val ocookieResultQQ  =  templateOcookie.findAllMatchIn(result)
+      ocookieResultQQ.foreach(x => {
+        QQNumber = x.toString()
+      })
+      if(!"".equals(QQNumber)) {
+        QQNumberSet.+= (QQNumber)
+      }
     }
+    QQNumber = QQNumberSet.mkString(",").toString
     QQNumber
   }
 

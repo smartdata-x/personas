@@ -46,11 +46,38 @@ object WeiBo extends  Platform {
     weiBoId
   }
 
+  def getEmailFromCookie(cookie:String): String ={
+    var email = ""
+    val emailSet = new mutable.HashSet[String]()
+    if (cookie != "NoDef") {
+      val result = StringUtil.decodeBase64 (cookie)
+      // val result = cookie
+      val template = "(?<=un=)\\w+@\\w+\\.com(?=;)".r
+      val resultEmail = template.findAllMatchIn (result)
+      resultEmail.foreach (x => {
+        email = x.toString ()
+      })
+      if (!"".equals (email)) {
+        emailSet.+= (email)
+      }
+    }
+    email = emailSet.mkString (",").toString
+    // println("email:"+email)
+    email
+  }
+
   def getWeiBoId(line:String): String ={
     val  lineSplit = line.split("\t")
     val cookies = lineSplit(3)
     val cookiesWeiBo = getWeiBoIdFromCookie(cookies)
     cookiesWeiBo
+  }
+
+  def getEmail(line:String): String = {
+    val  lineSplit = line.split("\t")
+    val cookies = lineSplit(3)
+    val cookiesEmail = getEmailFromCookie(cookies)
+    cookiesEmail
   }
 
   def extractUrl(url:String):String ={
