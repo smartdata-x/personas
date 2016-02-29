@@ -2,6 +2,8 @@ package com.kunyan.userportrait.rule.url
 
 import com.kunyan.userportrait.util.StringUtil
 
+import scala.collection.mutable
+
 
 /**
   * Created by C.J.YOU on 2016/2/24.
@@ -19,14 +21,28 @@ object WeiBo extends  Platform {
 
   def getWeiBoIdFromCookie(cookie:String): String ={
     var weiBoId = ""
+    val weiBoIdSet = new mutable.HashSet[String]()
     if (cookie != "NoDef") {
       val result = StringUtil.decodeBase64(cookie)
+      // val result = cookie
       val template = "(?<=SUS=SID-)\\d{1,}(?=-)".r
       val resultWeiBoId  =  template.findAllMatchIn(result)
       resultWeiBoId.foreach(x => {
         weiBoId = x.toString()
       })
+      if(!"".equals(weiBoId)){
+        weiBoIdSet.+=(weiBoId)
+      }
+      val wbFeedUnfolded = "(?<=wb_feed_unfolded_)\\d{1,}(?==)".r
+      val resultWeiBoId2  =  wbFeedUnfolded.findAllMatchIn(result)
+      resultWeiBoId2.foreach(x => {
+        weiBoId = x.toString()
+      })
+      if(!"".equals(weiBoId)){
+        weiBoIdSet.+=(weiBoId)
+      }
     }
+    weiBoId = weiBoIdSet.mkString(",").toString
     weiBoId
   }
 
