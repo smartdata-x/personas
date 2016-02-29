@@ -2,7 +2,7 @@ package com.kunyan.userportrait.scheduler
 
 import java.util.Properties
 
-import kafka.producer.{KeyedMessage, Producer, ProducerConfig}
+import kafka.producer.{Producer, ProducerConfig}
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
