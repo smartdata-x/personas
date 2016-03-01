@@ -3,9 +3,8 @@ package com.kunyan.userportrait.util
 import java.io._
 
 import com.kunyan.userportrait.config.FileConfig
-import com.kunyan.userportrait.platform.{PlatformScheduler, Eleme}
+import com.kunyan.userportrait.rule.url.PlatformScheduler
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -51,16 +50,19 @@ object FileUtil {
 
   /**
     * 保存AD,UA,URL
-    * @author C.J.YOU
-    * @param array
-    * @param pType
     */
-  def saveAdAndUaAndUrl(array:Array[String], pType:Int): Unit ={
+  def saveAdAndUaAndUrl(array:Array[String], pType:Int,dType:Int): Unit ={
     val dateStr = TimeUtil.getDay
-    val destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME
-    val dateDir = destPath + "/" + dateStr
-    mkDir(dateDir)
-    createFile(dateDir +"/"+TimeUtil.getCurrentHour,array)
+    var filter = array
+    var destPath = ""
+    if(dType == 1){
+      destPath= FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_HTTP +"/" + dateStr
+    }else if(dType == 2){
+      destPath = FileConfig.USER_DATA + "/" +PlatformScheduler.apply(pType).PLATFORM_NAME_INFO +"/" + dateStr
+      filter = array
+    }
+    mkDir(destPath)
+    createFile(destPath +"/"+TimeUtil.getCurrentHour,filter)
   }
 
 }
