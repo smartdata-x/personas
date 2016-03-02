@@ -3,6 +3,7 @@ package com.kunyan.userportrait.data
 import com.kunyan.userportrait.Extractor
 import com.kunyan.userportrait.config.FileFormatConfig
 import com.kunyan.userportrait.rule.url.PlatformScheduler
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
