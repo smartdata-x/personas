@@ -17,8 +17,8 @@ object PhoneUtil {
     phoneSet.++=(suNingPhone)
     if(!"".equals(elemePhone))
       phoneSet.+=(elemePhone)
-    if(!phoneSet.nonEmpty)
-     phone = phoneSet.mkString(",").toString
+    if(phoneSet.nonEmpty)
+      phone = phoneSet.mkString(",").toString
     phone
 
   }

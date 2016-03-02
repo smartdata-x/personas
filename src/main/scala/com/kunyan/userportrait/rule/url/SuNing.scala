@@ -64,8 +64,8 @@ object SuNing extends  Platform {
     var phone = ""
     if (cookies != "NoDef") {
       val result = StringUtil.decodeBase64(cookies)
-      val templet = "(?<=idsLoginUserIdLastTime=)\\d{11}".r
-      val resultPhone  =  templet.findAllMatchIn(result)
+      val template = "(?<=idsLoginUserIdLastTime=)\\d{11}".r
+      val resultPhone  =  template.findAllMatchIn(result)
       resultPhone.foreach(x => {
         phone = x.toString()
       })

@@ -30,7 +30,7 @@ object Extractor {
     val data = Analysis.loadData(1)
     val dataArray = data.map(x => {
       val ad = x.split("\t")(0)
-      ad +"\t"+ PhoneUtil.getPhone(x)+"\t"+QQNumberUtil.QQNumber(x)+"\t"+WeiBoUtil.getWeiBoNumber(x)
+      ad +"\t"+ PhoneUtil.getPhone(x)+"\t"+QQNumberUtil.QQNumber(x)+"\t"+WeiBoUtil.getWeiBoNumber(x)+"\t"+ EmailUtil.email(x)
     }).distinct().collect()
     // saveUser_Info
     FileUtil.saveAdAndUaAndUrl(dataArray,PlatformConfig.USER_INFO,2)
@@ -41,12 +41,12 @@ object Extractor {
     // saveWeiBoId
     FileUtil.saveAdAndUaAndUrl(dataArray.filter(_.split("\t")(3)!="Nothing"),PlatformConfig.PLATFORM_WEIBO,2)
     // get useful url for kid
-    val urlArray = data.map(x => {
-      val ad = x.split("\t")(0)
-      ad +"\t"+UrlUtil.getUrl(x)
-    }).distinct().collect()
-    // saveUrl
-    FileUtil.saveAdAndUaAndUrl(urlArray,PlatformConfig.HTTP_INFO,1)
+//    val urlArray = data.map(x => {
+//      val ad = x.split("\t")(0)
+//      ad +"\t"+UrlUtil.getUrl(x)
+//    }).distinct().collect()
+//    // saveUrl
+//    FileUtil.saveAdAndUaAndUrl(urlArray,PlatformConfig.HTTP_INFO,1)
     sc.stop()
 
   }
