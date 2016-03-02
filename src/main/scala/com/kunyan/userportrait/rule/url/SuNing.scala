@@ -73,4 +73,25 @@ object SuNing extends  Platform {
     phone
   }
 
+  def getEmail(line:String): String = {
+    val  lineSplit = line.split("\t")
+    val cookies = lineSplit(3)
+    val cookiesEmail = getEmailFromCookies(cookies)
+    cookiesEmail
+  }
+
+  def getEmailFromCookies(cookies:String):String = {
+    var email = ""
+    if (cookies != "NoDef") {
+      val result = StringUtil.decodeBase64(cookies)
+      val template = "(?<=idsLoginUserIdLastTime=)\\w+%40\\w+\\.com(?=;)".r
+      val resultEmail  =  template.findAllMatchIn(result)
+      resultEmail.foreach(x => {
+        email = x.toString()
+        email = email.replace("%40","@")
+      })
+    }
+    email
+  }
+
 }

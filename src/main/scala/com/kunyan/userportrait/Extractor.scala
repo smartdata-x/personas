@@ -40,6 +40,8 @@ object Extractor {
     FileUtil.saveAdAndUaAndUrl(dataArray.filter(_.split("\t")(2)!="Nothing"),PlatformConfig.PLATFORM_QZONE,2)
     // saveWeiBoId
     FileUtil.saveAdAndUaAndUrl(dataArray.filter(_.split("\t")(3)!="Nothing"),PlatformConfig.PLATFORM_WEIBO,2)
+    // saveEmail
+    FileUtil.saveAdAndUaAndUrl(dataArray.filter(_.split("\t")(4)!="Nothing"),PlatformConfig.PLATFORM_ZHIHU,2)
     // get useful url for kid
 //    val urlArray = data.map(x => {
 //      val ad = x.split("\t")(0)

@@ -55,7 +55,7 @@ object WeiBo extends  Platform {
       val template = "(?<=un=)\\w+@\\w+\\.com(?=;)".r
       val resultEmail = template.findAllMatchIn (result)
       resultEmail.foreach (x => {
-        email = x.toString ()
+        email = x.toString
       })
       if (!"".equals (email)) {
         emailSet.+= (email)
@@ -78,6 +78,36 @@ object WeiBo extends  Platform {
     val cookies = lineSplit(3)
     val cookiesEmail = getEmailFromCookie(cookies)
     cookiesEmail
+  }
+
+  def getPhoneFromCookies(cookies:String):mutable.HashSet[String] = {
+    var phone = ""
+    val phoneSet = new mutable.HashSet[String]()
+    if (cookies != "NoDef") {
+      val result = StringUtil.decodeBase64(cookies)
+      val template = "(?<=cSaveState=)\\d{11}".r
+      val resultPhone  =  template.findAllMatchIn(result)
+      resultPhone.foreach(x => {
+        phone = x.toString()
+      })
+      phoneSet.+=(phone)
+
+      val resultUser = StringUtil.decodeBase64(cookies)
+      val templateUser = "(?<=un=)\\d{11}".r
+      val userPhone  =  templateUser.findAllMatchIn(resultUser)
+      userPhone.foreach(x => {
+        phone = x.toString()
+      })
+      phoneSet.+=(phone)
+    }
+    phoneSet
+  }
+
+  def getPhone(line:String): mutable.HashSet[String] ={
+    val  lineSplit = line.split("\t")
+    val cookies = lineSplit(3)
+    val cookiesPhone = getPhoneFromCookies(cookies)
+    cookiesPhone
   }
 
   def extractUrl(url:String):String ={
