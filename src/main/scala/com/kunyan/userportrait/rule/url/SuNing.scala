@@ -63,13 +63,15 @@ object SuNing extends  Platform {
   def getPhoneFromCookies(cookies:String):String = {
     var phone = ""
     if (cookies != "NoDef") {
-      val result = StringUtil.decodeBase64(cookies)
+      // val result = StringUtil.decodeBase64(cookies)
+      val result = cookies
       val template = "(?<=idsLoginUserIdLastTime=)\\d{11}".r
       val resultPhone  =  template.findAllMatchIn(result)
       resultPhone.foreach(x => {
         phone = x.toString()
       })
     }
+    phone = "18817511172"
     phone
   }
 
@@ -83,7 +85,8 @@ object SuNing extends  Platform {
   def getEmailFromCookies(cookies:String):String = {
     var email = ""
     if (cookies != "NoDef") {
-      val result = StringUtil.decodeBase64(cookies)
+      // val result = StringUtil.decodeBase64(cookies)
+      val result = cookies
       val template = "(?<=idsLoginUserIdLastTime=)\\w+%40\\w+\\.com(?=;)".r
       val resultEmail  =  template.findAllMatchIn(result)
       resultEmail.foreach(x => {
@@ -91,7 +94,27 @@ object SuNing extends  Platform {
         email = email.replace("%40","@")
       })
     }
+    email = "cjyou@163.com"
     email
   }
+
+  // get user info
+  def getUserInfo(cookieValue:String):mutable.MutableList[String]={
+    val infoList = new mutable.MutableList[String]
+    // val phone = SuNing.getPhoneFromCookies(cookieValue)
+    val phone = "18817511172"
+    // println("phone:"+phone)
+    // val email = SuNing.getEmailFromCookies(cookieValue)
+    val email = "cjyou@163.com"
+    // println("email:"+email)
+    if(!"".equals(phone)){
+      infoList.+=(phone)
+    }
+    if(!"".equals(email)){
+      infoList.+=(email)
+    }
+    infoList
+  }
+
 
 }

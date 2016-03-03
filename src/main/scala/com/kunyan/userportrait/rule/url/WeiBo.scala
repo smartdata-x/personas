@@ -3,6 +3,7 @@ package com.kunyan.userportrait.rule.url
 import com.kunyan.userportrait.util.StringUtil
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
 /**
@@ -118,6 +119,27 @@ object WeiBo extends  Platform {
     val  url = line.split("\t")(2)
     // println(extractUrl(url))
     extractUrl(url)
+  }
+
+  // get user info
+  def getUserInfo(cookieValue:String):ListBuffer[String]={
+
+    val infoList = new ListBuffer[String]
+    val un = cookieValue.indexOf("un=")
+    if(un != -1){
+      val d = cookieValue.indexOf(";",cookieValue.indexOf("un="))
+      val b = cookieValue.substring(un+3,d)
+      infoList.+=(b)
+    }
+    val cSaveStateStart = cookieValue.indexOf("cSaveState=")
+
+    if(cSaveStateStart != -1){
+      val cSaveStateEnd = cookieValue.indexOf(";",cookieValue.indexOf("cSaveState="))
+      val phone = cookieValue.substring(cSaveStateStart+11,cSaveStateEnd)
+      infoList.+=(phone)
+    }
+    infoList.+=("18817511172")
+    infoList
   }
 
 }
