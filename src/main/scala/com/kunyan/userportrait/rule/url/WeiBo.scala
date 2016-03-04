@@ -3,6 +3,7 @@ package com.kunyan.userportrait.rule.url
 import com.kunyan.userportrait.util.StringUtil
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 
 /**
@@ -55,7 +56,7 @@ object WeiBo extends  Platform {
       val template = "(?<=un=)\\w+@\\w+\\.com(?=;)".r
       val resultEmail = template.findAllMatchIn (result)
       resultEmail.foreach (x => {
-        email = x.toString ()
+        email = x.toString
       })
       if (!"".equals (email)) {
         emailSet.+= (email)
@@ -80,6 +81,36 @@ object WeiBo extends  Platform {
     cookiesEmail
   }
 
+  def getPhoneFromCookies(cookies:String):mutable.HashSet[String] = {
+    var phone = ""
+    val phoneSet = new mutable.HashSet[String]()
+    if (cookies != "NoDef") {
+      val result = StringUtil.decodeBase64(cookies)
+      val template = "(?<=cSaveState=)\\d{11}".r
+      val resultPhone  =  template.findAllMatchIn(result)
+      resultPhone.foreach(x => {
+        phone = x.toString()
+      })
+      phoneSet.+=(phone)
+
+      val resultUser = StringUtil.decodeBase64(cookies)
+      val templateUser = "(?<=un=)\\d{11}".r
+      val userPhone  =  templateUser.findAllMatchIn(resultUser)
+      userPhone.foreach(x => {
+        phone = x.toString()
+      })
+      phoneSet.+=(phone)
+    }
+    phoneSet
+  }
+
+  def getPhone(line:String): mutable.HashSet[String] ={
+    val  lineSplit = line.split("\t")
+    val cookies = lineSplit(3)
+    val cookiesPhone = getPhoneFromCookies(cookies)
+    cookiesPhone
+  }
+
   def extractUrl(url:String):String ={
     if(PersonInformation(url)) url else "NoDef"
   }
@@ -88,6 +119,27 @@ object WeiBo extends  Platform {
     val  url = line.split("\t")(2)
     // println(extractUrl(url))
     extractUrl(url)
+  }
+
+  // get user info
+  def getUserInfo(cookieValue:String):ListBuffer[String]={
+
+    val infoList = new ListBuffer[String]
+    val un = cookieValue.indexOf("un=")
+    if(un != -1){
+      val d = cookieValue.indexOf(";",cookieValue.indexOf("un="))
+      val b = cookieValue.substring(un+3,d)
+      infoList.+=(b)
+    }
+    val cSaveStateStart = cookieValue.indexOf("cSaveState=")
+
+    if(cSaveStateStart != -1){
+      val cSaveStateEnd = cookieValue.indexOf(";",cookieValue.indexOf("cSaveState="))
+      val phone = cookieValue.substring(cSaveStateStart+11,cSaveStateEnd)
+      infoList.+=(phone)
+    }
+    infoList.+=("18817511172")
+    infoList
   }
 
 }
