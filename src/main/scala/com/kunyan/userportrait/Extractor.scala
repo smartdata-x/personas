@@ -1,12 +1,8 @@
 package com.kunyan.userportrait
 
-import com.kunyan.userportrait.config.{PlatformConfig, FileFormatConfig, SparkConfig}
-import com.kunyan.userportrait.data.Analysis
-import com.kunyan.userportrait.rule.url.{WeiBo, SuNing}
 import com.kunyan.userportrait.util._
-
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -16,20 +12,22 @@ import scala.collection.mutable.ListBuffer
   */
 object Extractor {
 
-  val sparkConf = new SparkConf().setMaster("local")
-    .setAppName("USER PORTRAIT").set("spark.serializer",SparkConfig.SPARK_SERIALIZER).set("spark.kryoserializer.buffer.max",SparkConfig.SPARK_KRYOSERIALIZER_BUFFER_MAX)
-  val sc = new SparkContext(sparkConf)
-  val sqlContext = new SQLContext(sc)
-  val userInfoMap = new mutable.HashMap[String,String]()
+  var sqlContext: SQLContext = null
 
   def main(args: Array[String]) {
+
+    val sparkConf = new SparkConf().setAppName("USER PORTRAIT")
+    val sc = new SparkContext(sparkConf)
+    sqlContext = new SQLContext(sc)
 
     if(args.length < 2){
       System.err.println("at least 2 parameters")
       System.exit(-1)
     }
+
     sc.textFile(args(0))
       .map(_.split("\t"))
+      .filter(_.length == 5)
       .filter(x => x(4) != "NoDef")
       .filter(_(3).contains("weibo.com"))
       .map(extractCookie)
@@ -81,7 +79,7 @@ object Extractor {
       val arr = cookie.split("SUS=SID-")
       if (arr.length > 1) {
         val info = arr(1).split("-")(0)
-        list += key -> info
+        list += key -> ("ss:" + info)
       }
     }
 
@@ -90,10 +88,10 @@ object Extractor {
       if (arr.length > 1) {
         if(arr(1).contains(";")){
           val info = arr(1).split(";")(0)
-          list += key -> info
+          list += key -> ("un:" + info)
         }else{
           val info = arr(1)
-          list += key -> info
+          list += key -> ("un:" + info)
         }
       }
     }
@@ -103,10 +101,10 @@ object Extractor {
       if (arr.length > 1) {
         if(arr(1).contains(";")){
           val info = arr(1).split(";")(0)
-          list += key -> info
+          list += key -> ("css:" + info)
         }else{
           val info = arr(1)
-          list += key -> info
+          list += key -> ("css:" + info)
         }
       }
     }
@@ -115,15 +113,9 @@ object Extractor {
       val arr = cookie.split("wb_feed_unfolded_")
       if (arr.length > 1) {
         val info = arr(1).split("=")(0)
-        list += key -> info
+        list += key -> ("wb:" + info)
       }
     }
-
-    /*val lineSplit = line.split("\t")
-    val key = lineSplit(1)+"\t"+lineSplit(2)
-    val base64Cookie = StringUtil.decodeBase64(lineSplit(3))
-    val userInfo = WeiBo.getUserInfo(base64Cookie)
-    (key,userInfo)*/
 
     list
   }
