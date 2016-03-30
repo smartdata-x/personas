@@ -13,12 +13,17 @@ object PhoneUtil {
     var phone = "Nothing"
     val phoneSet = new mutable.HashSet[String]()
     val suNingPhone  = SuNing.phone(lines)
-    val elemePhone = EleMe.phone(lines)
+    val eleMePhone = EleMe.phone(lines)
+    val weiBoPhone = WeiBo.getPhone(lines)
+
     phoneSet.++=(suNingPhone)
-    if(!"".equals(elemePhone))
-      phoneSet.+=(elemePhone)
-    if(!phoneSet.nonEmpty)
-     phone = phoneSet.mkString(",").toString
+    phoneSet.++=(weiBoPhone)
+
+    if(!"".equals(eleMePhone))
+      phoneSet.+=(eleMePhone)
+
+    if(phoneSet.nonEmpty)
+      phone = phoneSet.mkString(",").toString
     phone
 
   }

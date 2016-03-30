@@ -3,6 +3,7 @@ package com.kunyan.userportrait.data
 import com.kunyan.userportrait.Extractor
 import com.kunyan.userportrait.config.FileFormatConfig
 import com.kunyan.userportrait.rule.url.PlatformScheduler
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
@@ -10,7 +11,7 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 /**
   * Created by C.J.YOU on 2016/2/24.
   */
-object Analysis {
+object SQLWrapper {
 
   val sqlContext = Extractor.sqlContext
 
@@ -20,7 +21,6 @@ object Analysis {
     val dataFrame = sqlContext.createDataFrame(rowRDD,schemaFormat)
     dataFrame.registerTempTable(tableName)
   }
-
 
   def loadData(pType:Int): RDD[String] ={
     val result = sqlContext.sql("select distinct ad,ua,url,cookies from "+FileFormatConfig.tableName).map(x =>x(0)+"\t"+x(1)+"\t"+x(2)+"\t"+x(3))
