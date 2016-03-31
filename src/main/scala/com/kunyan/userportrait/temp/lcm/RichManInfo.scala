@@ -13,14 +13,13 @@ object RichManInfo {
   def main(args: Array[String]) {
     //    val file_in = args(0)
     //    val file_out = args(1)
-    val sparkConf = new SparkConf().setAppName("RICH MAN INFO").setMaster("local")
+    val sparkConf = new SparkConf().setAppName("RICH MAN INFO")
     //val sparkConf = new SparkConf().setAppName("RICH MAN INFO")
     val sc = new SparkContext(sparkConf)
     //将用户的所有手机号码输出到文件
     val writerRichPhone = new PrintWriter(new File("F:\\资料\\hadoop\\rich_info\\rich_phone"), "UTF-8")
     //输出的股票用户rich_info
     val writerRichInfo = new PrintWriter(new File("F:\\资料\\hadoop\\rich_info\\rich_info"), "UTF-8")
-    //val writerRichInfo = new PrintWriter(new File(file_out), "UTF-8")
 
     //将饿了么手机号数据读取到set集合
     //val eleme_phone = sc.textFile("file://" + file_in + "rich_phone/eleme_phone/*").map(x => {
@@ -120,7 +119,6 @@ object RichManInfo {
     //匹配出手email
     val ad_phone_email = ad_phone.leftOuterJoin(email)
       .map(x => {
-        //println(x)
         var str = ""
         if (x._2._2 == None) {
           x._1 + "\t" + x._2._1 + "\t" + "null"
