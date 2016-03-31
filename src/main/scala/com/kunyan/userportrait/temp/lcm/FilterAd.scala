@@ -8,7 +8,7 @@ import org.apache.spark.{SparkContext, SparkConf}
 /**
  * Created by lcm on 2016/3/23.
  */
-object FilterAd extends Serializable {
+object FilterAd {
 
   val setStockAd = new scala.collection.mutable.TreeSet[String]()
   val setRichAd = new scala.collection.mutable.TreeSet[String]()
