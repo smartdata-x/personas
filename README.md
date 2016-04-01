@@ -1,5 +1,5 @@
-# userportrait
-
+# personas
+[![Build Status](https://travis-ci.org/smartdata-x/personas.svg?branch=master)](https://travis-ci.org/smartdata-x/personas)
 ## 用户画像 ##
 1. 过滤出访问了特定网站的AD和User-Agent的URL
 2. 通过URL提取出用户的QQ等信息并存储
