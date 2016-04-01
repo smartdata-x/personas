@@ -6,6 +6,8 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.spark.{SparkConf, SparkContext}
 
+import scala.util.parsing.json.JSON
+
 /**
   * Created by yangshuai on 2016/3/22.
   */
@@ -20,7 +22,7 @@ object WeiboStepTwo {
 
     val hbaseConf = HBaseConfiguration.create
 
-    hbaseConf.set("hbase.rootdir", "hdfs://:9000/hbase")
+    hbaseConf.set("hbase.rootdir", "hdfs://localhost:9000/hbase")
     hbaseConf.set("hbase.zookeeper.quorum", "server")
 
     //设置查询的表名
@@ -55,7 +57,19 @@ object WeiboStepTwo {
   }
 
   def toJson(tuple: (String, String, String, String)): String = {
-    String.format("{\"ad\":\"%s\", \"ua\":\"%s\", \"url\":\"%s\", \"cookie\":\"%s\", \"platform\":\"eleme_info\"}", tuple._1, tuple._2, tuple._3, tuple._4)
+    String.format("{\"ad\":\"%s\", \"ua\":\"%s\", \"url\":\"%s\", \"cookie\":\"http://account.weibo.com/set/iframe\", \"platform\":\"weibo_info\"}", tuple._1, tuple._2, tuple._3)
   }
+
+  def toJson(tuple: (String, String, String)): String = {
+    String.format("{\"ad\":\"%s\", \"ua\":\"%s\", \"url\":\"http://account.weibo.com/set/iframe\", \"cookie\":\"%s\", \"platform\":\"weibo_info\"}", tuple._1, tuple._2, tuple._3)
+  }
+
+  def toJson(arr: Array[String]): String = {
+    String.format("{\"ad\":\"%s\", \"ua\":\"%s\", \"url\":\"http://account.weibo.com/set/iframe\", \"cookie\":\"%s\", \"platform\":\"weibo_info\"}", arr(0), arr(1), arr(3))
+  }
+
+/*  def convertJson(json: String): String = {
+    val map = JSON.parseFull(json).get.asInstanceOf[Map[String, String]]
+  }*/
 
 }

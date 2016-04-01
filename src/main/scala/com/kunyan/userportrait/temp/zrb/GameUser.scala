@@ -4,27 +4,36 @@ import org.apache.spark.{SparkContext, SparkConf}
 /**
   * Created by yangshuai on 2016/3/30.
   */
-object GameUser extend App{
-val test = "/user/wangcao/test"
-  val source3= "/home/zhnagruibo/weibo_phone"
-  val source4 = "/home/zhangruibo/email.data"
-  val source5 = "/home/zhangruibo/qq.data"
-  val tar = args(0)
-  val conf = new SparkConf().setAppName("GetData")
+object GameUser extends App{
+
+  val sourceWeiboPhone= "/home/zhnagruibo/weibo_phone"
+  val sourceEmail = "/home/zhangruibo/email.data"
+  val sourceQQ = "/home/zhangruibo/qq.data"
+
+  val conf = new SparkConf().setAppName("Game User Info")
+
   val sc = new SparkContext(conf)
-  val lines3 = sc.textFile(source3)
-  val lines4 = sc.textFile(source4)
-  val lines5 = sc.textFile(source5)
+  val lines3 = sc.textFile(sourceWeiboPhone)
+  val lines4 = sc.textFile(sourceEmail)
+  val lines5 = sc.textFile(sourceQQ)
   var map = Map[String, String]()
-  val AdTotal = sc.textFile(test).filter(x=>(x.length>=2)).map(x=>infoGet(x))
+
+  val AdTotal = sc.textFile(args(0)).filter(_.length >= 2).map(x => infoGet(x))
+
   val AD = AdTotal.distinct()
   //  sc.textFile(test).filter(x=>(x.length>=2)).map(x=>infoGet(x)).map(x=>(x,1)).distinct().saveAsTextFile(target)
   val lt = List("http://poker.qq.com/","http://bbs.g.qq.com/forum.php?mod=forumdisplay&fid=119","http://pw.lianzhong.com","http://bbs.lianzhong.com/showforum-10030.aspx","http://www.pook.com/games/dzpk.html","http://:www.jj.cn")
-  val row3_weiBo = lines3.map(_.split("\t")).filter(x=>(x.length == 5)).map(x=>(x(1),x(3)))
-  val row4_email = lines3.map(_.split("\t")).filter(x=>(x.length == 2)).map(x=>(x(0),x(1)))
-  val row5_qq = lines3.map(_.split("\t")).filter(x=>(x.length == 2)).map(x=>(x(0),x(1)))
+  val row3_weiBo = {
+    lines3.map(_.split("\t")).filter(_.length == 5).map(x => (x(1), x(3)))
+  }
+  val row4_email = {
+    lines3.map(_.split("\t")).filter(_.length == 2).map(x => (x(0), x(1)))
+  }
+  val row5_qq = {
+    lines3.map(_.split("\t")).filter(_.length == 2).map(x => (x(0), x(1)))
+  }
   //  val x = getAd("lale3c4ac8e58a28feb3203d44l78344a9d2a").foreach(println)
-  val AD_phone_email = AD.map(x=>getAd(x.toString)).saveAsTextFile(tar)
+  val AD_phone_email = AD.map(x=>getAd(x.toString)).saveAsTextFile(args(1))
   //  val AdCount = AdTotal.count().saveAsTextFile(tar)
   var res =  Map[String,String]()
   var qqcom = ""
@@ -34,7 +43,7 @@ val test = "/user/wangcao/test"
 
     for(i <- arr){
       val phone = row3_weiBo.lookup(i.toString)
-      if(phone != ""){
+      if(phone.nonEmpty){
         val email = row4_email.lookup(i.toString)
         res += (i.toString -> phone.toString)
         if(email != ""){
@@ -83,9 +92,9 @@ val test = "/user/wangcao/test"
       }
     }
     if(bl){
-      return ad
+      ad
     }else{
-      return ""
+      ""
     }
   }
 

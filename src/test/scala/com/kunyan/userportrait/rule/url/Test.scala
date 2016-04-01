@@ -1,28 +1,32 @@
 package com.kunyan.userportrait.rule.url
 
-import com.kunyan.userportrait.db.HbaseUtil
-import org.apache.hadoop.hbase.util.Bytes
-import org.jsoup.Jsoup
+import org.apache.hadoop.hbase.client.{ConnectionFactory, Get}
+import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
+
 
 /**
   * Created by yangshuai on 2016/3/16.
   */
 object Test extends App {
 
-  val result = HbaseUtil.getDataByRowkey("weibo_step1", "fc88033da1d7459a3dfb6daa225d0850")
-  val contentBytes = result.getValue(Bytes.toBytes("info"), Bytes.toBytes("content"))
-  val html = Jsoup.parse(new String(contentBytes)).toString
+  var hbaseConf = HBaseConfiguration.create
 
-  println(html)
+  hbaseConf.set("hbase.rootdir", "hdfs:localhost:9000/hbase")
+  hbaseConf.set("hbase.zookeeper.quorum", "master,slave1,slave2,slave3,slave4")
 
-  if (html.contains("$CONFIG['page_id']='")) {
-    val arr = html.split("CONFIG\\['page_id'\\]='")
-    if ( arr.length > 1) {
-      val result = arr(1).split("';")(0)
-      println(result)
-    } else {
-      println(arr(0))
-    }
-  }
+//  hbaseConf.set("hbase.rootdir", "hdfs:222.73.34.99:9000/hbase")
+//    hbaseConf.set("hbase.zookeeper.quorum", "server0,server1,server2")
+
+  val connection = ConnectionFactory.createConnection(hbaseConf)
+
+  val hTable = connection.getTable(TableName.valueOf("20"))
+
+  val get = new Get("ccf8333142812a36bbc94c1893d5fd57".getBytes)
+
+  val result = hTable.get(get)
+
+//  val content = new String(result.getValue("basic".getBytes, "content".getBytes))
+
+//  println(content)
 
 }
