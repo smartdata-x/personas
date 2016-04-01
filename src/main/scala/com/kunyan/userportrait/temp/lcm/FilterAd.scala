@@ -24,7 +24,7 @@ object FilterAd {
       val RichAdOut = args(2)
       val MergeAdOut = args(3)
 
-      val sparkConf = new SparkConf().setAppName("FILTER AD").setMaster("local")
+      val sparkConf = new SparkConf().setAppName("FILTER AD")
       val sc = new SparkContext(sparkConf)
 
       //输入的数据文件
