@@ -14,8 +14,11 @@ object HbaseUtil {
 
   var hbaseConf = HBaseConfiguration.create
 
-  hbaseConf.set("hbase.rootdir", "hdfs://:9000/hbase")
-  hbaseConf.set("hbase.zookeeper.quorum", "server")
+/*  hbaseConf.set("hbase.rootdir", "hdfs:222.73.34.99:9000/hbase")
+  hbaseConf.set("hbase.zookeeper.quorum", "server0,server1,server2")*/
+
+  hbaseConf.set("hbase.rootdir", "hdfs:localhost:9000/hbase")
+  hbaseConf.set("hbase.zookeeper.quorum", "master,slave1,slave2")
 
   private val connection = ConnectionFactory.createConnection(hbaseConf)
 
