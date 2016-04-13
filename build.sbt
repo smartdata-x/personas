@@ -12,8 +12,6 @@ libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3"
 
 dependencyOverrides += "org.slf4j" % "slf4j-log4j12" % "1.7.6"
 
-libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.20"
-
 libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.10.4" % "provided" excludeAll ExclusionRule(organization = "javax.servlet")
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.1" % "provided"
