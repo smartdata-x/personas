@@ -1,4 +1,4 @@
-mainClass in (Compile, packageBin) := Some("com.kunyan.userportrait.importdata.PokerCount")
+mainClass in (Compile, packageBin) := Some("com.kunyan.userportrait.temp.ys.CombineResult")
 
 name := "personas"
 
@@ -41,6 +41,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 libraryDependencies += "org.datanucleus" % "datanucleus-core" % "3.2.10" % "provided"
 
 libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.38"
+
+libraryDependencies += "com.google.guava" % "guava" % "14.0.1"
 
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
