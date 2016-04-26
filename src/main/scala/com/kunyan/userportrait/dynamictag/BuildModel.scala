@@ -50,7 +50,7 @@ object BuildModel {
     val recall1 = metrics1.recall(1.0)
 
     /** **
-      * 2 SVM regression model
+      * 2 SVM model
       * ***/
     val modelSVM = SVMWithSGD.train(train, 200)
     modelSVM.save(sc, "C:/Users/Administrator/Desktop/models/stockad/SVMmodel")
