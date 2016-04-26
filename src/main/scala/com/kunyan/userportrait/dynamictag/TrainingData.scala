@@ -11,7 +11,7 @@ import org.apache.spark.{SparkContext, SparkConf}
   */
 object TrainingData {
 
-  def getUrlUA (url: String): String = {
+  def getUrlRemoveHead (url: String): String = {
     var part = url
     try {
       if (url.contains("http://")) {
@@ -27,8 +27,8 @@ object TrainingData {
     part
   }
 
-  def getUrlUB (url: String): String = {
-    val host = getUrlUA(url)
+  def getUrlBody (url: String): String = {
+    val host = getUrlRemoveHead(url)
     var part = host
     try {
       if (host.startsWith("www.")) {
@@ -42,7 +42,7 @@ object TrainingData {
     part
   }
 
-  def getUrlK (url: String): String = {
+  def getUrlKey (url: String): String = {
     var part = url
     if (url.contains("http://www")) {
       part = url.substring(11, url.length)
@@ -63,15 +63,15 @@ object TrainingData {
       * 1. input and pre-process data
       */
     //1.1 input total data from telecom
-    val data = sc.textFile("C:/Users/Administrator/Desktop/人物分类模型second/targetData/*").map(_.split("\t"))
-      .filter(x => x.size == 6).map(x => (x(1), x(2), getUrlUB(x(3)), getUrlUB(x(4))))
+    val data = sc.textFile(args(0)).map(_.split("\t"))
+      .filter(x => x.size == 6).map(x => (x(1), x(2), getUrlBody(x(3)), getUrlBody(x(4))))
       .filter(x => !x._2.contains("spider") && !x._2.contains("Spider"))
       .filter(x => x._3 != "qq.com" && !x._3.contains("mail") && x._3 !="ip.com" && x._3 != "baidu.com" && x._3 != "so.com" && x._3 != "ti.com.cn" && x._3 != "le.com" && x._3 != "sina.com.cn" )
     data.cache()
 
     //1.2 input target url (only original url)
-    val totalUrl = sc.textFile("C:/Users/Administrator/Desktop/人物分类模型second/inputnew/stock_original.txt").map(x => x.trim)
-      .map(x => getUrlK(x)).distinct().filter(x => x.length > 0).collect.mkString(",", ",", ",")
+    val totalUrl = sc.textFile(args(1)).map(x => x.trim)
+      .map(x => getUrlKey(x)).distinct().filter(x => x.length > 0).collect.mkString(",", ",", ",")
 
     /**
       * 2. calculate features for each ad and ip
@@ -110,7 +110,7 @@ object TrainingData {
       *
       * pay attention: if the scales of features have large differences, it may be necessary to scale-down all of them
       */
-    val features = sc.textFile("C:/Users/Administrator/Desktop/finalTableS/part-00000")
+    val features = sc.textFile(arg(2))
       .map(x => x.replace("(", "")).map(x => x.replace(")", ""))
       .map(_.split(","))
       .filter(x => x(0).length == 40)
@@ -125,7 +125,7 @@ object TrainingData {
         case e: Exception => null
       })
 
-    stockTrain.filter(x=> x!= null).coalesce(1, true).saveAsTextFile("C:/Users/Administrator/Desktop/traningdata/Stockad2")
+    stockTrain.filter(x=> x!= null).coalesce(1, true).saveAsTextFile(args(3))
 
     data.unpersist()
     sc.stop()

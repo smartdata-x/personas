@@ -22,7 +22,7 @@ object BuildModel {
     val sc = new SparkContext(conf)
 
     // input the training data
-    val input = sc.textFile("C:/Users/Administrator/Desktop/traningdata/Stockad/part-00000").filter(x => !x.contains("()"))
+    val input = sc.textFile(args(0)).filter(x => !x.contains("()"))
 
     val parsedData = input.map { line =>
       val parts = line.split(",")
@@ -38,7 +38,7 @@ object BuildModel {
       * 1 logistic regression model
       * ***/
     val modelLogistic = LogisticRegressionWithSGD.train(train, 200)
-    modelLogistic.save(sc, "C:/Users/Administrator/Desktop/models/stockad/logisticmodel")
+    modelLogistic.save(sc, args(1))
 
     val predictionAndLabels1 = test.map {
       case LabeledPoint(label, features) =>
@@ -53,7 +53,7 @@ object BuildModel {
       * 2 SVM model
       * ***/
     val modelSVM = SVMWithSGD.train(train, 200)
-    modelSVM.save(sc, "C:/Users/Administrator/Desktop/models/stockad/SVMmodel")
+    modelSVM.save(sc, args(2))
 
     val predictionAndLabels2 = test.map {
       case LabeledPoint(label, features) =>
@@ -70,7 +70,7 @@ object BuildModel {
       * 3 NaiveBayes Model
       * ***/
     val modelBayes = NaiveBayes.train(train)
-    modelBayes.save(sc, "C:/Users/Administrator/Desktop/models/stockad/Bayesmodel")
+    modelBayes.save(sc, args(3))
 
     val predictionAndLabels3 = test.map {
       case LabeledPoint(label, features) =>

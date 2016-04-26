@@ -18,7 +18,7 @@ object PageRank {
     val sc = new SparkContext(conf) 
 		
     //read data
-    val lines = sc.textFile("/user/root/316/pg_data/total.txt")  
+    val lines = sc.textFile(args(0))  
 		
     //create edges
     val links = lines.map(_.split(" ")).filter(_.length == 2).map(parts => (parts(0), parts(1))).distinct().groupByKey()  
@@ -39,17 +39,17 @@ object PageRank {
     //execute cycle and calculate final scores for each url
     for (i <- 1 to 30) {  
       val score = sc.accumulator(0.0)  
-        val contribut = linkList.join(ranks).values.flatMap {  
-          case (urls, rank) => {  
-            val size = urls.size  
-              if (size == 0) {  
-                score += rank  
-                   List()  
-                     } else {  
-                       urls.map(url => (url, rank / size))  
-                    }  
-                }  
-            }      
+      val contribut = linkList.join(ranks).values.flatMap {  
+        case (urls, rank) => {  
+          val size = urls.size  
+          if (size == 0) {  
+            score += rank  
+            List()  
+          } else {  
+            urls.map(url => (url, rank / size))  
+          }  
+        }  
+      }      
       
     val scoreValue = score.value  
     ranks = contribut.reduceByKey(_ + _).mapValues[Double](p =>  
@@ -60,7 +60,7 @@ object PageRank {
     //ordered by scores and save as text file
     var outputSort = sc.parallelize(ranks.collect())
     outputSort = outputSort.sortBy(word => word._2,false)
-    outputSort.saveAsTextFile("/user/root/316/result2/rank_total")
+    outputSort.saveAsTextFile("args(1)")
 		
     sc.stop() 
     }  

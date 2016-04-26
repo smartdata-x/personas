@@ -10,7 +10,7 @@ import org.apache.spark.{SparkContext, SparkConf}
   */
 object TargetFeatures {
 
-  def getUrlU1(url:String):String= {
+  def getUrlRemoveHead(url:String):String= {
     var part = url
     try {
       if (url.contains("http://")) {
@@ -26,8 +26,8 @@ object TargetFeatures {
     part
   }
 
-  def getUrlU2(url:String):String= {
-    val host = getUrlU1(url)
+  def getUrlBody(url:String):String= {
+    val host = getUrlRemoveHead(url)
     var part = host
     try{
       if (host.startsWith("www.")){
@@ -41,7 +41,7 @@ object TargetFeatures {
     part
   }
 
-  def getUrlK(url:String):String={
+  def getUrlKey(url:String):String={
     var part = url
     if (url.contains("http://www")){
       part = url.substring(11,url.length)
@@ -62,17 +62,17 @@ object TargetFeatures {
       * 1. input and pre-process data
       */
     //1.1 input total data from telecom
-    val data = sc.textFile("C:/Users/Administrator/Desktop/人物分类模型second/targetData/*")
+    val data = sc.textFile(args(0))
       .map(_.split("\t")).filter(x => x.size == 6)
-      .map(x =>(x(1),x(2),getUrlU2(x(3)),getUrlU2(x(4))))
+      .map(x =>(x(1),x(2),getUrlBody(x(3)),getUrlBody(x(4))))
       .filter(x => !x._2.contains("spider") && !x._2.contains("Spider"))
       .filter(x => x._3 != "qq.com" && !x._3.contains("mail") && x._3 !="ip.com" && x._3 != "baidu.com" && x._3 != "so.com" && x._3 != "ti.com.cn" && x._3 != "le.com" && x._3 != "sina.com.cn" )
     data.persist(MEMORY_AND_DISK)
 
     //1.2 input target url (including both original url and extra url)
-    val totalUrl = sc.textFile("C:/Users/Administrator/Desktop/人物分类模型second/processedUrl/Stock/part-00000")
+    val totalUrl = sc.textFile("args(1)")
       .map(x => x.trim)
-      .map(x => getUrlK(x))
+      .map(x => getUrlKey(x))
       .distinct()
       .filter(x => x.length > 0)
       .collect.mkString(",", ",", ",")
@@ -124,7 +124,7 @@ object TargetFeatures {
     /**
       *  5.save the total result
       */
-    finalTable.coalesce(1).saveAsTextFile("C:/Users/Administrator/Desktop/finalTableS")
+    finalTable.coalesce(1).saveAsTextFile("args(2)")
 
     data.unpersist()
     labelLineRddUr.unpersist()
