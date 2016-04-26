@@ -110,7 +110,7 @@ object TrainingData {
       *
       * pay attention: if the scales of features have large differences, it may be necessary to scale-down all of them
       */
-    val features = sc.textFile(arg(2))
+    val features = sc.textFile(args(2))
       .map(x => x.replace("(", "")).map(x => x.replace(")", ""))
       .map(_.split(","))
       .filter(x => x(0).length == 40)
