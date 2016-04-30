@@ -77,6 +77,7 @@ object Extractor extends Serializable{
     val cookie = array(6)
     if (cookie.contains("SUS=SID-")) {
       val info = cookie.split("SUS=SID-")(1).split("-")(0)
+      // println("info:"+info)
       return  info
     } else  if (cookie.contains("SUP=")) {
       try {
@@ -151,22 +152,28 @@ object Extractor extends Serializable{
     if(cookie.contains("ua=")){
       val arr = cookie.split("ua=")
       if (arr.length > 1) {
-        val value = arr(1).split(";")(0).replace("%40qq.com","")
-        if (value forall Character.isDigit ){
-          info = value.toLong.toString
-          return  info
+        val value = arr(1).split(";")(0)
+        if(value.contains("%40qq.com")){
+          val tempInfo = value.replace("%40qq.com","")
+          if (tempInfo forall Character.isDigit ){
+            info = tempInfo.toLong.toString
+            return  info
+          }
         }
+
       }
     }
-
     // kfc
     if(cookie.contains("yum_ueserInfo=")) {
       val arr = cookie.split("yum_ueserInfo=")
       if (arr.length > 1) {
-        val value = arr(1).split(";")(0).replace("%40qq.com","")
-        if (value forall Character.isDigit ){
-          info = value.toLong.toString
-          return  info
+        val value = arr(1).split(";")(0)
+        if(value.contains("%40qq.com")){
+          val tempInfo = value.replace("%40qq.com","")
+          if (tempInfo forall Character.isDigit ){
+            info = tempInfo.toLong.toString
+            return  info
+          }
         }
       }
     }
