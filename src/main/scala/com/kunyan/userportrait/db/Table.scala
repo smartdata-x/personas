@@ -4,11 +4,12 @@ import java.sql.Connection
 import java.util.Properties
 
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
-// "jdbc:mysql://222.73.34.91:3306/jindowin?user=personas&password=personas&useUnicode=true&characterEncoding=utf8"
+// "jdbc:mysql://:3306/jindowin?user=personas&password=personas&useUnicode=true&characterEncoding=utf8"
 /**
   * Created by C.J.YOU on 2016/4/26.
   */
 object Table extends  Serializable{
+
   // readData
   def getTableData(sqlc:SQLContext,readConnection:String,tableName:String): Unit ={
     val properties = new Properties()
@@ -20,7 +21,7 @@ object Table extends  Serializable{
   def writeTableData(dataFrame: DataFrame,writeConnection:String,tableName:String): Unit ={
     val properties = new Properties()
     properties.setProperty("driver","com.mysql.jdbc.Driver")
-    dataFrame.write.mode(SaveMode.Overwrite).jdbc(writeConnection,tableName,properties)
+    dataFrame.write.mode(SaveMode.Append).jdbc(writeConnection,tableName,properties)
   }
 
   // judge
@@ -47,8 +48,8 @@ object Table extends  Serializable{
     var item2 =""
     val rs = statement.executeQuery(String.format("select "+col(0) +","+col(1) +" from main_index where id =\"%s\"",param))
     while (rs.next()) {
-      item1 = rs.getString(1)
-      item2 = rs.getString(2)
+       item1 = rs.getString(1)
+       item2 = rs.getString(2)
     }
     (item1,item2)
   }

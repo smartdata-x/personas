@@ -15,59 +15,72 @@ object Extractor extends Serializable{
   // phone
   private def phone(array: Array[String]): String ={
     var info =""
-    val cookie = array(6)
-    if (cookie.contains("cSaveState=")) {
-      val template = "(?<=cSaveState=)\\d{11}".r
-      val resultPhone  =  template.findAllMatchIn(cookie)
-      resultPhone.foreach(x => {
-        info = x.toString
-        return  info
-      })
-    } else if (cookie.contains("un=")) {
-      val arr = cookie.split("un=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if (value forall Character.isDigit){
-          info = value
-          return  info
-        }
-      }
-    }
-    if(cookie.contains("idsLoginUserIdLastTime=")){
-      val arr = cookie.split("idsLoginUserIdLastTime=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if (value forall Character.isDigit){
-          info = value
-          return  info
-        }
-      }
-    }
-    // dian ping
-    if(cookie.contains("ua=")){
-      val arr = cookie.split("ua=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if (value forall Character.isDigit ){
-          if(value.toLong.toString.length == 11){
+    try {
+      val cookie = array (6)
+      if (cookie.contains ("cSaveState=")) {
+        val template = "(?<=cSaveState=)\\d{11}".r
+        val resultPhone = template.findAllMatchIn (cookie)
+        resultPhone.foreach (x => {
+          info = x.toString
+          return info
+        })
+      } else if (cookie.contains ("un=")) {
+        val arr = cookie.split ("un=")
+        if (arr.length > 1) {
+          val value = arr (1).split (";")(0)
+          if (value forall Character.isDigit) {
             info = value
-            return  info
+            return info
           }
         }
       }
-    }
-    // kfc
-    if(cookie.contains("yum_ueserInfo=")){
-      val arr = cookie.split("yum_ueserInfo=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if ( value forall Character.isDigit){
-          if(value.toLong.toString.length == 11){
+      if (cookie.contains ("idsLoginUserIdLastTime=")) {
+        val arr = cookie.split ("idsLoginUserIdLastTime=")
+        if (arr.length > 1) {
+          val value = arr (1).split (";")(0)
+          if (value forall Character.isDigit) {
             info = value
-            return  info
+            return info
           }
         }
       }
+      // dian ping
+      if (cookie.contains ("ua=")) {
+        try {
+          val arr = cookie.split ("ua=")
+          if (arr.length > 1) {
+            val value = arr (1).split (";")(0)
+            if (value.nonEmpty && (value forall Character.isDigit)) {
+              if (value.toLong.toString.length == 11) {
+                info = value
+                return info
+              }
+            }
+          }
+        } catch {
+          case e:Exception => println("dian ping phone error")
+        }
+      }
+      // kfc
+      if (cookie.contains ("yum_ueserInfo=")) {
+        try {
+          val arr = cookie.split ("yum_ueserInfo=")
+          if (arr.length > 1) {
+            val value = arr (1).split (";")(0)
+            if (value.nonEmpty && (value forall Character.isDigit)) {
+              if (value.toLong.toString.length == 11) {
+                info = value
+                return info
+              }
+            }
+          }
+        } catch {
+          case e:Exception => println("kfc phone error")
+        }
+      }
+    } catch {
+      case e:Exception =>
+        println(e.getMessage)
     }
     info
   }
@@ -150,31 +163,39 @@ object Extractor extends Serializable{
     }
     // dian ping
     if(cookie.contains("ua=")){
-      val arr = cookie.split("ua=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if(value.contains("%40qq.com")){
-          val tempInfo = value.replace("%40qq.com","")
-          if (tempInfo forall Character.isDigit ){
-            info = tempInfo.toLong.toString
-            return  info
+      try {
+        val arr = cookie.split ("ua=")
+        if (arr.length > 1) {
+          val value = arr (1).split (";")(0) // .replace("%40qq.com","")
+          if (value.contains ("%40qq.com")) {
+            val tempInfo = value.replace ("%40qq.com", "")
+            if (tempInfo.nonEmpty && (tempInfo forall Character.isDigit)) {
+              info = tempInfo.toLong.toString
+              return info
+            }
           }
         }
-
+      } catch {
+        case e:Exception => println("dian ping qq error")
       }
     }
+
     // kfc
     if(cookie.contains("yum_ueserInfo=")) {
-      val arr = cookie.split("yum_ueserInfo=")
-      if (arr.length > 1) {
-        val value = arr(1).split(";")(0)
-        if(value.contains("%40qq.com")){
-          val tempInfo = value.replace("%40qq.com","")
-          if (tempInfo forall Character.isDigit ){
-            info = tempInfo.toLong.toString
-            return  info
+      try {
+        val arr = cookie.split ("yum_ueserInfo=")
+        if (arr.length > 1) {
+          val value = arr (1).split (";")(0)
+          if (value.contains ("%40qq.com")) {
+            val tempInfo = value.replace ("%40qq.com", "")
+            if (tempInfo.nonEmpty && (tempInfo forall Character.isDigit)) {
+              info = tempInfo.toLong.toString
+              return info
+            }
           }
         }
+      } catch {
+        case e:Exception => println("kfc qq error")
       }
     }
     info
