@@ -1,5 +1,6 @@
 package com.kunyan.userportrait.util
 
+import jodd.util.URLDecoder
 import org.apache.spark.{SparkContext, SparkConf}
 import sun.misc.BASE64Decoder
 
@@ -78,4 +79,8 @@ object StringUtil {
     getResult((userId, result))
   }
 
+  def urlDecode(string: String):String ={
+    val decoder  = URLDecoder.decode(string,"utf-8")
+    decoder
+  }
 }
