@@ -14,12 +14,11 @@ import org.apache.spark.{SparkContext, SparkConf}
   * @author  zhangruibo
   */
 object InforRule {
+
   def main(args: Array[String]): Unit = {
     val source = args(0)
-//      "f:/linying3.txt"
     val path = args(1)
-//  "f:/lyUerInfor"
-    val function = List[String](
+    val list = List[String](
        "\"fullname\":\"",
       "\"firstTopCurrentPosition\"",
       "\"industry_highlight\"",
@@ -29,8 +28,6 @@ object InforRule {
        "\"IMs\":[{\"type\":"
     )
     val conf = new SparkConf().setAppName("GetData")
-//      .setMaster("local[*]")
-//      .set("spark.executor.memory", "10g")
     val sc = new SparkContext(conf)
     val rule1 = sc.textFile(source)
       .filter(x => x.contains("\"fullname\":\"") || x.contains("\"firstTopCurrentPosition\"") ||
@@ -38,56 +35,50 @@ object InforRule {
         x.contains("\"phones\":[{\"number\":") || x.contains("\"emails\":[{\"email\":") ||
         x.contains("\"IMs\":[{\"type\":"))
     val rule2 = sc.broadcast(rule1)
-    //val distData = sc.parallelize(function)
-    val data = function.map(x => rule(x, rule2))
+    val data = list.map(x => rule(x, rule2))
       .map(x => {
-      if(x._1.contains("\"fullname\":\"")) getName(x._2)
-      else if(x._1.contains("\"firstTopCurrentPosition\"")) getProfession(x._2)
-      else if(x._1.contains("\"industry_highlight\"")) getIndustry(x._2)
-      else if(x._1.contains("\"addresses\":[{\"address\":")) getAdresses(x._2)
-      else if(x._1.contains("\"phones\":[{\"number\":"))  getPhones(x._2)
-      else if(x._1.contains("\"emails\":[{\"email\":")) getEmail(x._2)
-      else if(x._1.contains("\"emails\":[{\"email\":") || x._1.contains("\"IMs\":[{\"type\":"))
+      if (x._1.contains("\"fullname\":\"")) getName(x._2)
+      else if (x._1.contains("\"firstTopCurrentPosition\"")) getProfession(x._2)
+      else if (x._1.contains("\"industry_highlight\"")) getIndustry(x._2)
+      else if (x._1.contains("\"addresses\":[{\"address\":")) getAdresses(x._2)
+      else if (x._1.contains("\"phones\":[{\"number\":"))  getPhones(x._2)
+      else if (x._1.contains("\"emails\":[{\"email\":")) getEmail(x._2)
+      else if (x._1.contains("\"emails\":[{\"email\":") || x._1.contains("\"IMs\":[{\"type\":"))
         getQqFromOut(getIMS(x._2),getEmail(x._2))
         })
     val distData = sc.parallelize(data)
     distData.repartition(1).saveAsTextFile(path)
-//    val  outStream = new FileOutputStream("E:/5.txt")
-//    val  objectOutputStream = new ObjectOutputStream(outStream)
-//    objectOutputStream.writeObject(s,"utf8")
-//    outStream.close()
   }
 
-  //name
+  // get name
   def getName(result: String): (String, String) = {
     val start = result.indexOf("\"fullname\":\"") + 12
     val name = result.substring(start, result.length - 1).split("\"")(0)
     ("name", name)
   }
 
-  //职业
+  //get profession
   def getProfession(result: String): (String, String) = {
     val start = result.indexOf("\"firstTopCurrentPosition\":{\"") + 28
     val profession = result.substring(start, result.length - 1).split("\"")(6)
     ("profession", profession)
   }
 
-  //行业
+  //get industry
   def getIndustry(result: String): (String, String) = {
     val start = result.indexOf("\"industry_highlight\":\"") + 22
     val industry = result.substring(start, result.length - 1).split("\"")(0)
     ("industry", industry)
   }
 
-  //adresses
+  //get adresses
   def getAdresses(result: String): (String, String) = {
     val start = result.indexOf("{\"addresses\":[{\"address\":\"") + 26
     val adresses = result.substring(start, result.length - 1).split("\"")(0)
-
     ("adresses", adresses)
   }
 
-  //phones
+  //get phones
   def getPhones(result: String): (String, String) = {
     val start = result.indexOf("\"phones\":[{\"number\":") + 21
     val end = start + 11
@@ -95,32 +86,35 @@ object InforRule {
     ("phones", phones)
   }
 
-  //email
+  //get email
   def getEmail(result: String): (String, String) = {
     var email = ""
     if (result.contains("\"emails\":[{\"email\":")) {
       val start = result.indexOf("\"emails\":[{\"email\":") + 20
       email = result.substring(start, result.length - 1).split("\"")(0)
     }
-    ("email", email) //(qq)
+    ("email", email) 
   }
 
-  //IMS
+  //get IMS
   def getIMS(result: String): (String, String) = {
     var ImsType = ""
     var userName = ""
     if (result.contains("\"IMs\":[{\"type\":")) {
+	
       val start = result.indexOf("\"IMs\":[{\"type\":")
       val content = result.substring(start, result.length - 1)
       if (content.contains("qq")) {
+	  
         ImsType = "qq"
         val qqStart = content.indexOf("qq") + 16
         val qqEnd = content.indexOf("}")
         userName = content.substring(qqStart, qqEnd - 1)
+		
       }
+	  
     }
     (ImsType, userName)
-    //get type,username   (qq)
   }
 
   //get qq from Ims or email
@@ -133,19 +127,23 @@ object InforRule {
     else {
       if (email._2.contains("qq")) {
         qq = email._2.split("@")(0)
-//          .substring(0, email._2.length - 8)
-      }
+      }	  
     }
     ("qq", qq)
   }
+  
   var str = ""
+  
+  //get data what can get information 
   def rule(result: String, ruleOne: Broadcast[RDD[String]]): (String, String) = {
     var flag = 1
     for (i <- ruleOne.value) {
+	
       while (i.contains(result) && i != "" && flag == 1) {
         str = i
         flag = 0
       }
+	  
     }
     (result, str)
   }
