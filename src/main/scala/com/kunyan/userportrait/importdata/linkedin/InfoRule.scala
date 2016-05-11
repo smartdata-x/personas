@@ -19,6 +19,7 @@ object InfoRule {
   
     val source = args(0)
     val path = args(1)
+	
     val list = List[String](
        "\"fullname\":\"",
       "\"firstTopCurrentPosition\"",
@@ -28,6 +29,7 @@ object InfoRule {
       "\"emails\":[{\"email\":",
        "\"IMs\":[{\"type\":"
     )
+	
     val conf = new SparkConf().setAppName("GetData")
     val sc = new SparkContext(conf)
 	
@@ -36,19 +38,23 @@ object InfoRule {
         x.contains("\"industry_highlight\"") || x.contains("\"addresses\":[{\"address\":") ||
         x.contains("\"phones\":[{\"number\":") || x.contains("\"emails\":[{\"email\":") ||
         x.contains("\"IMs\":[{\"type\":"))
+		
     val broadcastRule = sc.broadcast(ruleFilter)
 	
     val data = list.map(x => rule(x, broadcastRule))
       .map(x => {
-      if(x._1.equals("\"fullname\":\"") && x._2 != "") getName(x._2)
-      else if(x._1.equals("\"firstTopCurrentPosition\"") && x._2.contains("title\":\"")) getProfession(x._2)
-      else if(x._1.equals("\"industry_highlight\"") && x._2 != "") getIndustry(x._2)
-      else if(x._1.equals("\"addresses\":[{\"address\":") && x._2 != "") getAdresses(x._2)
-      else if(x._1.equals("\"phones\":[{\"number\":") && x._2 != "")  getPhones(x._2)
-      else if(x._1.equals("\"emails\":[{\"email\":") && x._2 != "") getEmail(x._2)
-      else if(x._1.equals("\"emails\":[{\"email\":") || x._1.equals("\"IMs\":[{\"type\":") && x._2 != "")
+	  
+      if (x._1.equals("\"fullname\":\"") && x._2 != "") getName(x._2)
+      else if (x._1.equals("\"firstTopCurrentPosition\"") && x._2.contains("title\":\"")) getProfession(x._2)
+      else if (x._1.equals("\"industry_highlight\"") && x._2 != "") getIndustry(x._2)
+      else if (x._1.equals("\"addresses\":[{\"address\":") && x._2 != "") getAdresses(x._2)
+      else if (x._1.equals("\"phones\":[{\"number\":") && x._2 != "")  getPhones(x._2)
+      else if (x._1.equals("\"emails\":[{\"email\":") && x._2 != "") getEmail(x._2)
+      else if (x._1.equals("\"emails\":[{\"email\":") || x._1.equals("\"IMs\":[{\"type\":") && x._2 != "")
         getQqFromOut(getIMS(x._2),getEmail(x._2))
+		
         })
+		
     val distData = sc.parallelize(data)
     distData.repartition(1).saveAsTextFile(path)
 	
@@ -59,7 +65,9 @@ object InfoRule {
   
     val start = result.indexOf("\"fullname\":\"") + 11
     val name = result.substring(start, result.length - 1).split("\"")(0)
+	
     ("name", name)
+	
   }
 
   //get profession
@@ -67,7 +75,9 @@ object InfoRule {
   
     val start = result.indexOf("title\":\"")
     val profession = result.substring(start, result.length - 1).split("\"")(2)
+	
     ("profession", profession)
+	
   }
 
   //get industry
@@ -75,7 +85,9 @@ object InfoRule {
   
     val start = result.indexOf("\"industry_highlight\":\"") + 22
     val industry = result.substring(start, result.length - 1).split("\"")(0)
+	
     ("industry", industry)
+	
   }
 
   //get adresses
@@ -83,7 +95,9 @@ object InfoRule {
   
     val start = result.indexOf("{\"addresses\":[{\"address\":\"") + 26
     val adresses = result.substring(start, result.length - 1).split("\"")(0)
+	
     ("adresses", adresses)
+	
   }
 
   //get phones
@@ -92,7 +106,9 @@ object InfoRule {
     val start = result.indexOf("\"phones\":[{\"number\":") + 21
     val end = start + 11
     val phones = result.substring(start, end)
+	
     ("phones", phones)
+	
   }
 
   //get email
@@ -104,7 +120,9 @@ object InfoRule {
       val start = result.indexOf("\"emails\":[{\"email\":") + 20
       email = result.substring(start, result.length - 1).split("\"")(0)
     }
+	
     ("email", email) 
+	
   }
 
   //get IMS
@@ -128,6 +146,7 @@ object InfoRule {
       }
 	  
     }
+	
     (ImsType, userName)
 	
   }
@@ -139,12 +158,14 @@ object InfoRule {
 
     if (ims._1.equals("qq")) {
       qq = ims._2
-    }
-    else {
+    } else {
+	
       if (email._2.contains("qq")) {
         qq = email._2.split("@")(0)
       }	  
+	  
     }
+	
     ("qq", qq)
 	
   }
@@ -156,22 +177,24 @@ object InfoRule {
   
     var flag = 1
 	
-    for (i <- ruleOne.value) {
+    for (value <- ruleOne.value) {
 	
-      if(flag == 1){
+      if (flag == 1) {
 	  
-        if (i.contains(result) == true) {
+        if (value.contains(result) == true) {
 		
-          val start = i.indexOf(result)
-          str = i.substring(start, start + 200)
+          val start = value.indexOf(result)
+          str = value.substring(start, start + 200)
           flag = 0
 		  
-        }
-        else{
+        } else {
           str = ""
         }
-      }	  
+		
+      }	
+	  
     }
+	
     (result, str)
 	
   }
