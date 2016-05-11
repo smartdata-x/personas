@@ -31,22 +31,22 @@ object InfoRule {
     val conf = new SparkConf().setAppName("GetData")
     val sc = new SparkContext(conf)
 	
-    val rule1 = sc.textFile(source)
+    val ruleFilter = sc.textFile(source)
       .filter(x => x.contains("\"fullname\":\"") || x.contains("\"firstTopCurrentPosition\"") ||
         x.contains("\"industry_highlight\"") || x.contains("\"addresses\":[{\"address\":") ||
         x.contains("\"phones\":[{\"number\":") || x.contains("\"emails\":[{\"email\":") ||
         x.contains("\"IMs\":[{\"type\":"))
-    val rule2 = sc.broadcast(rule1)
+    val broadcastRule = sc.broadcast(ruleFilter)
 	
-    val data = list.map(x => rule(x, rule2))
+    val data = list.map(x => rule(x, broadcastRule))
       .map(x => {
-      if (x._1.contains("\"fullname\":\"")) getName(x._2)
-      else if (x._1.contains("\"firstTopCurrentPosition\"")) getProfession(x._2)
-      else if (x._1.contains("\"industry_highlight\"")) getIndustry(x._2)
-      else if (x._1.contains("\"addresses\":[{\"address\":")) getAdresses(x._2)
-      else if (x._1.contains("\"phones\":[{\"number\":"))  getPhones(x._2)
-      else if (x._1.contains("\"emails\":[{\"email\":")) getEmail(x._2)
-      else if (x._1.contains("\"emails\":[{\"email\":") || x._1.contains("\"IMs\":[{\"type\":"))
+      if(x._1.equals("\"fullname\":\"") && x._2 != "") getName(x._2)
+      else if(x._1.equals("\"firstTopCurrentPosition\"") && x._2.contains("title\":\"")) getProfession(x._2)
+      else if(x._1.equals("\"industry_highlight\"") && x._2 != "") getIndustry(x._2)
+      else if(x._1.equals("\"addresses\":[{\"address\":") && x._2 != "") getAdresses(x._2)
+      else if(x._1.equals("\"phones\":[{\"number\":") && x._2 != "")  getPhones(x._2)
+      else if(x._1.equals("\"emails\":[{\"email\":") && x._2 != "") getEmail(x._2)
+      else if(x._1.equals("\"emails\":[{\"email\":") || x._1.equals("\"IMs\":[{\"type\":") && x._2 != "")
         getQqFromOut(getIMS(x._2),getEmail(x._2))
         })
     val distData = sc.parallelize(data)
@@ -57,7 +57,7 @@ object InfoRule {
   // get name
   def getName(result: String): (String, String) = {
   
-    val start = result.indexOf("\"fullname\":\"") + 12
+    val start = result.indexOf("\"fullname\":\"") + 11
     val name = result.substring(start, result.length - 1).split("\"")(0)
     ("name", name)
   }
@@ -65,8 +65,8 @@ object InfoRule {
   //get profession
   def getProfession(result: String): (String, String) = {
   
-    val start = result.indexOf("\"firstTopCurrentPosition\":{\"") + 28
-    val profession = result.substring(start, result.length - 1).split("\"")(6)
+    val start = result.indexOf("title\":\"")
+    val profession = result.substring(start, result.length - 1).split("\"")(2)
     ("profession", profession)
   }
 
@@ -158,12 +158,22 @@ object InfoRule {
 	
     for (i <- ruleOne.value) {
 	
-      while (i.contains(result) && i != "" && flag == 1) {
-        str = i
-        flag = 0
+      if(flag == 1){
+	  
+        if (i.contains(result) == true) {
+		
+          val start = i.indexOf(result)
+          str = i.substring(start, start + 200)
+          flag = 0
+		  
+        }
+        else{
+          str = ""
+        }
       }	  
     }
     (result, str)
+	
   }
   
 }
