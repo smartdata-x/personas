@@ -13,9 +13,9 @@ object Extractor extends Serializable {
     * @param arr 电信数据按分隔符分隔后的数组
     * @return 用户信息元组
     */
-  def extratorUserInfo(arr: Array[String]): (String, String, String) = {
+  def extractorUserInfo(arr: Array[String]): (String, String, String) = {
 
-    (phone(arr),qq(arr),weibo(arr))
+    (phone(arr), qq(arr), weibo(arr))
 
   }
 
@@ -26,13 +26,13 @@ object Extractor extends Serializable {
     */
   private def phone(array: Array[String]): String = {
 
-    var info =""
+    var info = ""
 
     try {
 
-      val cookie = array (6)
+      val cookie = array(6)
 
-      if (cookie.contains ("cSaveState=")) {
+      if (cookie.contains("cSaveState=")) {
 
         val template = "(?<=cSaveState=)\\d{11}".r
         val resultPhone = template.findAllMatchIn (cookie)
@@ -44,13 +44,13 @@ object Extractor extends Serializable {
           return info
 
         })
-      } else if (cookie.contains ("un=")) {
+      } else if (cookie.contains("un=")) {
 
-        val arr = cookie.split ("un=")
+        val arr = cookie.split("un=")
 
         if (arr.length > 1) {
 
-          val value = arr (1).split (";")(0)
+          val value = arr (1).split(";")(0)
 
           if (value forall Character.isDigit) {
 
@@ -63,11 +63,11 @@ object Extractor extends Serializable {
       }
       if (cookie.contains ("idsLoginUserIdLastTime=")) {
 
-        val arr = cookie.split ("idsLoginUserIdLastTime=")
+        val arr = cookie.split("idsLoginUserIdLastTime=")
 
         if (arr.length > 1) {
 
-          val value = arr (1).split (";")(0)
+          val value = arr(1).split(";")(0)
 
           if (value forall Character.isDigit) {
 
@@ -82,15 +82,15 @@ object Extractor extends Serializable {
       /**
         * 点评获取用户手机
         */
-      if (cookie.contains ("ua=")) {
+      if (cookie.contains("ua=")) {
 
         try {
 
-          val arr = cookie.split ("ua=")
+          val arr = cookie.split("ua=")
 
           if (arr.length > 1) {
 
-            val value = arr (1).split (";")(0)
+            val value = arr(1).split(";")(0)
 
             if (value.nonEmpty && (value forall Character.isDigit)) {
 
@@ -111,15 +111,15 @@ object Extractor extends Serializable {
       /**
         * kfc 获取用户手机
         */
-      if (cookie.contains ("yum_ueserInfo=")) {
+      if (cookie.contains("yum_ueserInfo=")) {
 
         try {
 
-          val arr = cookie.split ("yum_ueserInfo=")
+          val arr = cookie.split("yum_ueserInfo=")
 
           if (arr.length > 1) {
 
-            val value = arr (1).split (";")(0)
+            val value = arr(1).split(";")(0)
 
             if (value.nonEmpty && (value forall Character.isDigit)) {
 
@@ -171,12 +171,12 @@ object Extractor extends Serializable {
 
       try {
 
-        val cookieValue = StringUtil.urlDecode (cookie)
-        val name = cookieValue.indexOf ("uid=")
+        val cookieValue = StringUtil.urlDecode(cookie)
+        val name = cookieValue.indexOf("uid=")
 
         if (name != -1) {
 
-          val d = cookieValue.substring(name + 4).split ("&")(0)
+          val d = cookieValue.substring(name + 4).split("&")(0)
 
           info = d.toString
 
@@ -214,16 +214,16 @@ object Extractor extends Serializable {
 
       try {
 
-        val name = cookie.indexOf ("name=")
+        val name = cookie.indexOf("name=")
 
         if (name != -1) {
 
-          val d = cookie.substring (name + 5).split (";")(0)
+          val d = cookie.substring(name + 5).split(";")(0)
           val decode = StringUtil.urlDecode(d).split("&")(0)
 
-          if (decode.contains ("%40qq.com")){
+          if (decode.contains("%40qq.com")){
 
-            val tempInfo = decode.replace ("%40qq.com", "")
+            val tempInfo = decode.replace("%40qq.com", "")
 
             if(tempInfo forall Character.isDigit){
 
@@ -297,15 +297,15 @@ object Extractor extends Serializable {
 
       try {
 
-        val arr = cookie.split ("ua=")
+        val arr = cookie.split("ua=")
 
         if (arr.length > 1) {
 
-          val value = arr (1).split (";")(0)
+          val value = arr(1).split(";")(0)
 
-          if (value.contains ("%40qq.com")) {
+          if (value.contains("%40qq.com")) {
 
-            val tempInfo = value.replace ("%40qq.com", "")
+            val tempInfo = value.replace("%40qq.com", "")
 
             if (tempInfo.nonEmpty && (tempInfo forall Character.isDigit)) {
 
@@ -330,15 +330,15 @@ object Extractor extends Serializable {
 
       try {
 
-        val arr = cookie.split ("yum_ueserInfo=")
+        val arr = cookie.split("yum_ueserInfo=")
 
         if (arr.length > 1) {
 
-          val value = arr (1).split (";")(0)
+          val value = arr(1).split(";")(0)
 
-          if (value.contains ("%40qq.com")) {
+          if (value.contains("%40qq.com")) {
 
-            val tempInfo = value.replace ("%40qq.com", "")
+            val tempInfo = value.replace("%40qq.com", "")
 
             if (tempInfo.nonEmpty && (tempInfo forall Character.isDigit)) {
 

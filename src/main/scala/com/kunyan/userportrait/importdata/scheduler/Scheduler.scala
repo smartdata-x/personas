@@ -42,39 +42,39 @@ object Scheduler extends Serializable {
         .filter(_.length == 8)
         .filter(x => x(6) != "NoDef")
         .filter(x => x(3).contains("weibo.com") || x(3).contains("suning.com") || x(3).contains("qq.com") || x(3).contains("dianping.com") || x(3).contains("4008823823.com.cn"))
-        .map(Extractor.extratorUserInfo)
+        .map(Extractor.extractorUserInfo)
         .filter(filterUserInfo)
         .distinct().persist(StorageLevel.MEMORY_AND_DISK).repartition(3)
       val updateUserInfo = userInfo.map(divideInsertMap).groupByKey()
       val insertUserInfo = updateUserInfo.lookup(0).head.filter(filterUserInfo)
-      println("insertIterator size:"+insertUserInfo.size)
+      println("insertIterator size:" + insertUserInfo.size)
       println("INSERTING.........................")
-      DBOperation.batchInsert(Array("phone", "qq", "weibo"),insertUserInfo)
+      DBOperation.batchInsert(Array("phone", "qq", "weibo"), insertUserInfo)
       println("INSERTED.........................")
-      val item1 = updateUserInfo.lookup(1)
-      val item2 = updateUserInfo.lookup(2)
-      val item3 = updateUserInfo.lookup(3)
+      val updatePhone = updateUserInfo.lookup(1)
+      val updateQQ = updateUserInfo.lookup(2)
+      val updateWeiBo = updateUserInfo.lookup(3)
       println("UPDATING...........................")
 
-      if(item1.nonEmpty){
+      if(updatePhone.nonEmpty){
 
-        val phoneUpdateIterator = item1.head
-        println("phoneUpdateIterator size:"+phoneUpdateIterator.size)
-        DBOperation.batchUpdate(Array("qq", "weibo"),phoneUpdateIterator)
-
-      }
-
-      if(item2.nonEmpty){
-
-        val qqUpdateIterator = item2.head
-        println("qqUpdateIterator size:"+qqUpdateIterator.size)
-        DBOperation.batchUpdate(Array("phone", "weibo"),qqUpdateIterator)
+        val phoneUpdateIterator = updatePhone.head
+        println("phoneUpdateIterator size:" + phoneUpdateIterator.size)
+        DBOperation.batchUpdate(Array("qq", "weibo"), phoneUpdateIterator)
 
       }
 
-      if(item3.nonEmpty) {
+      if(updateQQ.nonEmpty){
 
-        val weiboUpateIterator = item3.head
+        val qqUpdateIterator = updateQQ.head
+        println("qqUpdateIterator size:" + qqUpdateIterator.size)
+        DBOperation.batchUpdate(Array("phone", "weibo"), qqUpdateIterator)
+
+      }
+
+      if(updateWeiBo.nonEmpty) {
+
+        val weiboUpateIterator = updateWeiBo.head
         println ("weiboUpateIterator size:" + weiboUpateIterator.size)
         DBOperation.batchUpdate (Array ("phone", "qq"), weiboUpateIterator)
 
@@ -115,9 +115,18 @@ object Scheduler extends Serializable {
     var phone = item._1
     var qq = item._2
     var weibo = item._3
-    if (phone.isEmpty) phone = "Nodef"
-    if (qq.isEmpty) qq = "Nodef"
-    if (weibo.isEmpty) weibo = "Nodef"
+
+    if (phone.isEmpty) {
+      phone = "Nodef"
+    }
+
+    if (qq.isEmpty) {
+      qq = "Nodef"
+    }
+
+    if (weibo.isEmpty) {
+      weibo = "Nodef"
+    }
     val phoneDataFrame = Table.isExist("phone",phone,DBOperation.connection)
     val qqDataFrame = Table.isExist("qq",qq,DBOperation.connection)
     val weiboDataFrame = Table.isExist("weibo",weibo,DBOperation.connection)
@@ -132,11 +141,12 @@ object Scheduler extends Serializable {
       distinctQQ = distinctQQ.+(qq)
       distinctWeibo = distinctWeibo.+(weibo)
 
-      (0,(item._1, item._2, item._3))
+      (0, (item._1, item._2, item._3))
 
     } else if(phoneDataFrame._1 != -1) {
 
       val id = phoneDataFrame._1
+
       if (qq == "Nodef") {
         qq = phoneDataFrame._3
       }
@@ -144,7 +154,7 @@ object Scheduler extends Serializable {
         weibo = phoneDataFrame._4
       }
 
-      (1,(qq, weibo, id.toString))
+      (1, (qq, weibo, id.toString))
 
     } else if(qqDataFrame._1 != -1) {
 
@@ -158,7 +168,7 @@ object Scheduler extends Serializable {
         weibo = qqDataFrame._4
       }
 
-      (2,(phone, weibo, id.toString))
+      (2, (phone, weibo, id.toString))
 
     }else if(weiboDataFrame._1 != -1) {
 
@@ -172,10 +182,10 @@ object Scheduler extends Serializable {
         qq = weiboDataFrame._3
       }
 
-      (3,(phone, qq, id.toString))
+      (3, (phone, qq, id.toString))
 
     } else {
-      (0,("","",""))
+      (0, ("", "", ""))
     }
   }
 }

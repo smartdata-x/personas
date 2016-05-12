@@ -33,9 +33,9 @@ object DBOperation extends Serializable {
 
       iterator.foreach(data => {
 
-        ps.setString (1,data._1)
-        ps.setString (2,data._2)
-        ps.setString (3,data._3)
+        ps.setString(1, data._1)
+        ps.setString(2, data._2)
+        ps.setString(3, data._3)
         ps.addBatch()
       })
       ps.executeBatch()
@@ -69,9 +69,9 @@ object DBOperation extends Serializable {
       iterator.foreach(data => {
 
         ps = connection.prepareStatement(sql)
-        ps.setString(1,data._1)
-        ps.setString (2,data._2)
-        ps.setInt(3,data._3.toInt)
+        ps.setString(1, data._1)
+        ps.setString(2, data._2)
+        ps.setInt(3, data._3.toInt)
         ps.addBatch()
 
       })
