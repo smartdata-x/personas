@@ -5,6 +5,7 @@ import java.util.regex.Pattern
 
 import com.kunyan.userportrait.temp.lcm.crawler.util.WeiBo
 import org.jsoup.{HttpStatusException, Jsoup}
+import parquet.Log
 
 import scala.collection.immutable.HashSet
 import scala.io.Source
@@ -95,11 +96,12 @@ object Controller {
 
     } catch {
 
-      case ex: HttpStatusException => println(ex)
+      case ex: HttpStatusException => ex.printStackTrace()
 
-      case ex: SocketTimeoutException => println(ex)
+      case ex: SocketTimeoutException => ex.printStackTrace()
 
-      case ex: SocketException => println(ex)
+      case ex: SocketException => ex.printStackTrace()
+
     }
 
     ipPort
@@ -116,8 +118,6 @@ object Controller {
     val ip = ipPort(0)
 
     val port = ipPort(1)
-
-    println(ip + "  " + port)
 
     System.getProperties.setProperty("http.proxyHost", ip)
 

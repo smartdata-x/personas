@@ -91,8 +91,6 @@ object WeiBo {
 
             if (info != "") {
 
-              println("info--" + info)
-
               weiBoInfo = weiBoInfo.+(info)
 
             }
@@ -114,8 +112,6 @@ object WeiBo {
     while (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
 
     }
-
-    print("pool over")
 
     weiBoInfo
 
@@ -157,11 +153,11 @@ object WeiBo {
 
       case ex: SocketTimeoutException => matchAndGetId(ua, uid, cookies)
 
-      case ex: ConnectException => println(ex)
+      case ex: ConnectException => ex.printStackTrace()
 
       case ex: HttpStatusException =>
 
-        println(ex)
+        ex.printStackTrace()
 
         Controller.changIP()
 
@@ -284,7 +280,7 @@ object WeiBo {
 
       case ex: SocketTimeoutException => getUserInfoById(cookies, id, ua)
 
-      case ex: ConnectException => println(ex)
+      case ex: ConnectException => ex.printStackTrace()
 
       case ex: HttpStatusException =>
 
@@ -292,7 +288,7 @@ object WeiBo {
 
         Controller.changIP()
 
-      case ex: IOException => println(ex)
+      case ex: IOException => ex.printStackTrace()
 
     }
 
@@ -367,8 +363,6 @@ object WeiBo {
 
       wbWeiBoIdSet = wbWeiBoIdSet.+(weiBoId)
 
-      println("weibo-id =" + weiBoId)
-
     }
 
     val main_weiBoResultSet = statement.executeQuery("SELECT id,weibo FROM main_index where weibo<> \"\"")
@@ -385,7 +379,6 @@ object WeiBo {
       mainWeiBoIdMap.put(weiBo, id)
 
     }
-    println(mainWeiBoIdMap.size)
 
     for (infoStr <- weiBoInfo) {
 
