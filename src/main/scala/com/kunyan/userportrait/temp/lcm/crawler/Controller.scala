@@ -17,7 +17,6 @@ import scala.io.Source
 object Controller {
 
   val ua = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36 QIHU 360SE se.360.cn"
-
   var ips: Array[String] = null
 
   def main(args: Array[String]) {
@@ -27,7 +26,6 @@ object Controller {
 
     //切换代理ip
     ips = getIPs
-
     changIP()
 
     //读取源数据文件
@@ -42,15 +40,12 @@ object Controller {
 
           //保存单条信息的ua、uid
           val pattern = Pattern.compile("/\\d+")
-
           var m = pattern.matcher(lineArr(4))
-
           var uid = ""
 
           if (m.find()) {
 
             uid = m.group()
-
             setUaAndUid = setUaAndUid.+((lineArr(2), uid))
 
           }
@@ -60,15 +55,11 @@ object Controller {
           if (m.find()) {
 
             uid = m.group()
-
             setUaAndUid = setUaAndUid.+((lineArr(2), uid))
 
           }
-
         }
-
       }
-
     }
 
     //爬取微博信息并保存
@@ -91,15 +82,12 @@ object Controller {
         .timeout(30000)
         .followRedirects(true)
         .execute()
-
       ipPort = doc.body().split("\r\n")
 
     } catch {
 
       case ex: HttpStatusException => ex.printStackTrace()
-
       case ex: SocketTimeoutException => ex.printStackTrace()
-
       case ex: SocketException => ex.printStackTrace()
 
     }
@@ -114,13 +102,9 @@ object Controller {
   def changIP(): Unit = {
 
     val ipPort = ips((Math.random() * 200).toInt).split(":")
-
     val ip = ipPort(0)
-
     val port = ipPort(1)
-
     System.getProperties.setProperty("http.proxyHost", ip)
-
     System.getProperties.setProperty("http.proxyPort", port)
 
   }

@@ -35,7 +35,6 @@ object WeiBo {
     //保存用户信息
     saveWeiBoInfos(weiBoInfo)
 
-
   }
 
   /**
@@ -45,16 +44,16 @@ object WeiBo {
   def getCookies(cookieStr: String): util.HashMap[String, String] = {
 
     val cookieMap = new util.HashMap[String, String]()
-
     val cookieArr = cookieStr.split(";")
 
     for (line <- cookieArr) {
+
       val lineArr = line.split("=")
+
       if (lineArr.length > 1) {
         cookieMap.put(lineArr(0), lineArr(1))
 
       }
-
     }
 
     cookieMap
@@ -69,11 +68,9 @@ object WeiBo {
   def getWeiBoInfo(data: HashSet[(String, String)], cookies: util.HashMap[String, String]): HashSet[String] = {
 
     var weiBoInfo = new HashSet[String]
-
     val listId = data.toList
 
     //创建一个可重用固定线程数的线程池
-
     val pool = Executors.newFixedThreadPool(80)
 
     for (index <- listId.indices) {
@@ -94,11 +91,8 @@ object WeiBo {
               weiBoInfo = weiBoInfo.+(info)
 
             }
-
           }
-
         }
-
       })
 
       pool.execute(thread)
@@ -108,7 +102,6 @@ object WeiBo {
     pool.shutdown()
 
     //停止主线程，等到子多线程运行结束再开启
-
     while (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
 
     }
@@ -137,30 +130,20 @@ object WeiBo {
         .method(Method.GET)
         .followRedirects(true)
         .execute()
-
       doc.body().split("\\$CONFIG").foreach(f => {
 
         if (f.contains("['page_id']")) {
-
           id = f.replace(";", "").split("=")(1).replace("'", "").trim
-
         }
-
       })
-
     }
     catch {
 
       case ex: SocketTimeoutException => matchAndGetId(ua, uid, cookies)
-
       case ex: ConnectException => ex.printStackTrace()
-
       case ex: HttpStatusException =>
-
         ex.printStackTrace()
-
         Controller.changIP()
-
       case ex: IOException => println(ex)
 
     }
@@ -220,11 +203,8 @@ object WeiBo {
       for (x <- doc.body().split("<script>FM.view")) {
 
         if (x.contains("\"ns\":\"\",\"domid\":\"Pl_Official_PersonalInfo__62\"")) {
-
           val data = x.replace("\\t", "").replace("\\n", "").replace("\\r", "")
-
           val dataArr = data.split("<span class=\\\\\"pt_title S_txt2\\\\\">")
-
           dataArr.foreach(d => {
 
             //获取QQ信息
@@ -242,7 +222,6 @@ object WeiBo {
             }
 
             //获取所在地
-
             if (d.contains("所在地")) {
 
               address = parserInfo("所在地", d)
@@ -253,7 +232,6 @@ object WeiBo {
             if (d.contains("公司")) {
 
               val workInfo = parserInfo("公司", d).split("=")
-
               company = workInfo(0)
 
               if (workInfo.length == 2) {
@@ -261,13 +239,9 @@ object WeiBo {
                 position = workInfo(1)
 
               }
-
             }
-
           })
-
         }
-
       }
 
       if (address != "NoDef") {
@@ -275,19 +249,13 @@ object WeiBo {
         userInfo = weiBoId + "-->" + QQ + "-->" + email + "-->" + job + "-->" + position + "-->" + realName + "-->" + company + "-->" + address
 
       }
-
     } catch {
 
       case ex: SocketTimeoutException => getUserInfoById(cookies, id, ua)
-
       case ex: ConnectException => ex.printStackTrace()
-
       case ex: HttpStatusException =>
-
-        println(ex)
-
+        ex.printStackTrace()
         Controller.changIP()
-
       case ex: IOException => ex.printStackTrace()
 
     }
@@ -307,9 +275,7 @@ object WeiBo {
     if (infoName == "公司") {
 
       val workInfo = infoStr.split("<\\\\/span>")(1)
-
       val company = workInfo.split("<\\\\/a>")(0).split(">").last
-
       var position = ""
 
       if (workInfo.contains("职位")) {
@@ -333,9 +299,7 @@ object WeiBo {
         anyInfo
 
       }
-
     }
-
   }
 
   /**
@@ -345,13 +309,9 @@ object WeiBo {
   def saveWeiBoInfos(weiBoInfo: HashSet[String]): Unit = {
 
     val conn_str = "jdbc:mysql://222.73.34.91:3306/personas?user=personas&password=personas"
-
     classOf[com.mysql.jdbc.Driver]
-
     val conn = DriverManager.getConnection(conn_str)
-
     val statement = conn.createStatement()
-
     val wb_weiBoResultSet = statement.executeQuery("SELECT weibo_id FROM weibo")
 
     //获取微博表中微博id,并保存到集合
@@ -360,7 +320,6 @@ object WeiBo {
     while (wb_weiBoResultSet.next()) {
 
       val weiBoId = wb_weiBoResultSet.getString("weibo_id")
-
       wbWeiBoIdSet = wbWeiBoIdSet.+(weiBoId)
 
     }
@@ -373,9 +332,7 @@ object WeiBo {
     while (main_weiBoResultSet.next()) {
 
       val id = main_weiBoResultSet.getInt("id")
-
       val weiBo = main_weiBoResultSet.getString("weibo")
-
       mainWeiBoIdMap.put(weiBo, id)
 
     }
@@ -383,7 +340,6 @@ object WeiBo {
     for (infoStr <- weiBoInfo) {
 
       val infoArr = infoStr.split("-->")
-
       val uid = infoArr(0)
 
       if (wbWeiBoIdSet.contains(uid)) {
@@ -413,9 +369,7 @@ object WeiBo {
           //将数据保存到临时空间
 
         }
-        
       }
-      
     }
 
     conn.close()
