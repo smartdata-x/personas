@@ -21,15 +21,19 @@ object WeiBo {
 
   var cookieException = 0
 
-  def crawlWeiBoInfo(datas: HashSet[Array[String]]): Unit = {
+  /**
+   *
+   * @param data：ua和uid的集合
+   */
+  def crawlWeiBoInfo(data: HashSet[(String, String)]): Unit = {
 
     val cookieStr = "SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9W59Fnqh3XZYLGbqL7yEge5O5JpX5K2hUgL.Fo2RSK.71Kn4SKBt; UOR=,weibo.com,spr_web_360_hao360_weibo_t001; SINAGLOBAL=3532024244608.283.1463017300810; ULV=1463017300844:1:1:1:3532024244608.283.1463017300810:; SUHB=0btNwX-16L0ipb; ALF=1494553349; un=angelxue3427@msn.com; wvr=6; YF-Ugrow-G0=1eba44dbebf62c27ae66e16d40e02964; login_sid_t=b7309f125841ae04196717bebba28d7b; _s_tentry=-; Apache=3532024244608.283.1463017300810; SUS=SID-1859098954-1463017349-GZ-m5r2g-4f451a0dcc87ebac6a48db72a8e1c66a; SUE=es%3Dcb5da348cff7750570aa8d3748dc9d32%26ev%3Dv1%26es2%3D1e2481db867012e9a24bccdc64509bbc%26rs0%3DVDralZgXwwMzfG3fOCwyWuR4aOv3HkMkEhAqLgoLH2SU6XPDVl3Bj6edqCGzJtou2sWfp0FSMouj51Omv7Ga0xLBe%252FgO4W%252BhaGnArRS3lOdsN5rRwb9EzBPvz%252FageDsKCu6eBJwm2tXQkAb08ju0ta33tBR8Y%252FAgUDGAdeWa3%252BU%253D%26rv%3D0; SUP=cv%3D1%26bt%3D1463017349%26et%3D1463103749%26d%3Dc909%26i%3Dc66a%26us%3D1%26vf%3D0%26vt%3D0%26ac%3D0%26st%3D0%26uid%3D1859098954%26name%3Dangelxue3427%2540msn.com%26nick%3D%25E4%25BD%2595%25E6%25AD%25A2%25E6%2583%25B3%25E4%25BD%25A0%26fmp%3D%26lcp%3D2013-05-06%252011%253A02%253A02; SUB=_2A256N6_VDeRxGedG7lsR-SbFzjiIHXVZRIYdrDV8PUNbuNBeLWXRkW9LHesgckLb12l4N_U4-gKymcKRJQ8hgw..; SSOLoginState=1463017349; YF-V5-G0=1913748929273ee181b5c020a6f91640; YF-Page-G0=59104684d5296c124160a1b451efa4ac"
 
     //获取微博用户信息
-    val weiboInfos = getWeiBoInfo(datas, getCookies(cookieStr))
+    val weiBoInfo = getWeiBoInfo(data, getCookies(cookieStr))
 
     //保存用户信息
-    saveWeiBoInfos(weiboInfos)
+    saveWeiBoInfos(weiBoInfo)
 
 
   }
@@ -39,50 +43,57 @@ object WeiBo {
    * 根据cookie字符串获取cookie的map
    */
   def getCookies(cookieStr: String): util.HashMap[String, String] = {
+
     val cookieMap = new util.HashMap[String, String]()
+
     val cookieArr = cookieStr.split(";")
+
     for (line <- cookieArr) {
       val lineArr = line.split("=")
       if (lineArr.length > 1) {
         cookieMap.put(lineArr(0), lineArr(1))
+
       }
+
     }
+
     cookieMap
+
   }
 
   /**
-   * @param datas ： 用于爬取用户信息的id集合
+   * @param data ： 用于爬取用户信息的id集合
    * @param cookies：用于发送请求带的参数
    * @return：微博的用户信息集合
    */
-  def getWeiBoInfo(datas: HashSet[Array[String]], cookies: util.HashMap[String, String]): HashSet[String] = {
+  def getWeiBoInfo(data: HashSet[(String, String)], cookies: util.HashMap[String, String]): HashSet[String] = {
 
-    var weiBoInfos = new HashSet[String]
+    var weiBoInfo = new HashSet[String]
 
-    val listId = datas.toList
+    val listId = data.toList
 
     //创建一个可重用固定线程数的线程池
 
-    val pool = Executors.newFixedThreadPool(80);
+    val pool = Executors.newFixedThreadPool(80)
 
-    for (index <- 0 to listId.size - 1) {
+    for (index <- listId.indices) {
 
       val thread = new Thread(new Runnable {
 
         override def run(): Unit = {
 
           //用url获取id
-          val id = matchAndGetId(listId(index)(0), listId(index)(1), cookies)
+          val id = matchAndGetId(listId(index)._1, listId(index)._2, cookies)
 
           if (id != "") {
 
-            val info = getUserInfoById(cookies, id, listId(index)(0))
+            val info = getUserInfoById(cookies, id, listId(index)._1)
 
             if (info != "") {
 
               println("info--" + info)
 
-              weiBoInfos = weiBoInfos.+(info)
+              weiBoInfo = weiBoInfo.+(info)
 
             }
 
@@ -106,7 +117,7 @@ object WeiBo {
 
     print("pool over")
 
-    weiBoInfos
+    weiBoInfo
 
   }
 
@@ -144,21 +155,15 @@ object WeiBo {
     }
     catch {
 
-      case ex: SocketTimeoutException => {
-
-        matchAndGetId(ua, uid, cookies)
-
-      }
+      case ex: SocketTimeoutException => matchAndGetId(ua, uid, cookies)
 
       case ex: ConnectException => println(ex)
 
-      case ex: HttpStatusException => {
+      case ex: HttpStatusException =>
 
         println(ex)
 
         Controller.changIP()
-
-      }
 
       case ex: IOException => println(ex)
 
@@ -222,9 +227,9 @@ object WeiBo {
 
           val data = x.replace("\\t", "").replace("\\n", "").replace("\\r", "")
 
-          val datas = data.split("<span class=\\\\\"pt_title S_txt2\\\\\">")
+          val dataArr = data.split("<span class=\\\\\"pt_title S_txt2\\\\\">")
 
-          datas.foreach(d => {
+          dataArr.foreach(d => {
 
             //获取QQ信息
             if (d.contains("QQ")) {
@@ -281,13 +286,11 @@ object WeiBo {
 
       case ex: ConnectException => println(ex)
 
-      case ex: HttpStatusException => {
+      case ex: HttpStatusException =>
 
         println(ex)
 
         Controller.changIP()
-
-      }
 
       case ex: IOException => println(ex)
 
@@ -319,7 +322,7 @@ object WeiBo {
 
       }
 
-      return company + "=" + position
+      company + "=" + position
 
     } else {
 
@@ -327,11 +330,11 @@ object WeiBo {
 
       if (anyInfo.contains("pt_detail")) {
 
-        return "NoDef"
+        "NoDef"
 
       } else {
 
-        return anyInfo
+        anyInfo
 
       }
 
@@ -341,9 +344,9 @@ object WeiBo {
 
   /**
    * 用于保存微博信息
-   * @param weiboInfos：微博用于的信息集合
+   * @param weiBoInfo：微博用于的信息集合
    */
-  def saveWeiBoInfos(weiboInfos: HashSet[String]): Unit = {
+  def saveWeiBoInfos(weiBoInfo: HashSet[String]): Unit = {
 
     val conn_str = "jdbc:mysql://222.73.34.91:3306/personas?user=personas&password=personas"
 
@@ -353,63 +356,63 @@ object WeiBo {
 
     val statement = conn.createStatement()
 
-    val wb_weiboResultSet = statement.executeQuery("SELECT weibo_id FROM weibo")
+    val wb_weiBoResultSet = statement.executeQuery("SELECT weibo_id FROM weibo")
 
     //获取微博表中微博id,并保存到集合
-    var wbWeiboIdSet = new HashSet[String]
+    var wbWeiBoIdSet = new HashSet[String]
 
-    while (wb_weiboResultSet.next()) {
+    while (wb_weiBoResultSet.next()) {
 
-      val weiboId = wb_weiboResultSet.getString("weibo_id")
+      val weiBoId = wb_weiBoResultSet.getString("weibo_id")
 
-      wbWeiboIdSet = wbWeiboIdSet.+(weiboId)
+      wbWeiBoIdSet = wbWeiBoIdSet.+(weiBoId)
 
-      println("weibo-id =" + weiboId)
+      println("weibo-id =" + weiBoId)
 
     }
 
-    val main_weiboResultSet = statement.executeQuery("SELECT id,weibo FROM main_index where weibo<> \"\"")
+    val main_weiBoResultSet = statement.executeQuery("SELECT id,weibo FROM main_index where weibo<> \"\"")
 
     //获取main_index中的微博id,并保存到map
-    val mainWeiboIdMap = new util.HashMap[String, Int]
+    val mainWeiBoIdMap = new util.HashMap[String, Int]
 
-    while (main_weiboResultSet.next()) {
+    while (main_weiBoResultSet.next()) {
 
-      val id = main_weiboResultSet.getInt("id")
+      val id = main_weiBoResultSet.getInt("id")
 
-      val weibo = main_weiboResultSet.getString("weibo")
+      val weiBo = main_weiBoResultSet.getString("weibo")
 
-      mainWeiboIdMap.put(weibo, id)
+      mainWeiBoIdMap.put(weiBo, id)
 
     }
-    println(mainWeiboIdMap.size)
+    println(mainWeiBoIdMap.size)
 
-    for (infoStr <- weiboInfos) {
+    for (infoStr <- weiBoInfo) {
 
-      val infos = infoStr.split("-->")
+      val infoArr = infoStr.split("-->")
 
-      val uid = infos(0)
+      val uid = infoArr(0)
 
-      if (wbWeiboIdSet.contains(uid)) {
+      if (wbWeiBoIdSet.contains(uid)) {
 
         //将数据保存到临时空间
 
       } else {
 
-        if (mainWeiboIdMap.containsKey(uid)) {
+        if (mainWeiBoIdMap.containsKey(uid)) {
 
-          //将数据写到weibo表中
+          //将数据写到weiBo表中
 
           val prep = conn.prepareStatement("INSERT INTO weibo (main_index_id, weibo_id,qq,email,job,position,realName,company,address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")
-          prep.setInt(1, mainWeiboIdMap.get(uid))
+          prep.setInt(1, mainWeiBoIdMap.get(uid))
           prep.setString(2, uid)
-          prep.setString(3, infos(1))
-          prep.setString(4, infos(2))
-          prep.setString(5, infos(3))
-          prep.setString(6, infos(4))
-          prep.setString(7, infos(5))
-          prep.setString(8, infos(6))
-          prep.setString(9, infos(7))
+          prep.setString(3, infoArr(1))
+          prep.setString(4, infoArr(2))
+          prep.setString(5, infoArr(3))
+          prep.setString(6, infoArr(4))
+          prep.setString(7, infoArr(5))
+          prep.setString(8, infoArr(6))
+          prep.setString(9, infoArr(7))
           prep.executeUpdate
 
         } else {
@@ -417,10 +420,13 @@ object WeiBo {
           //将数据保存到临时空间
 
         }
+        
       }
+      
     }
 
     conn.close()
+    
   }
 
 }

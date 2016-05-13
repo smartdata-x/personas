@@ -22,7 +22,7 @@ object Controller {
   def main(args: Array[String]) {
 
     //保存微博的信息
-    var setUid = new HashSet[Array[String]]
+    var setUaAndUid = new HashSet[(String,String)]
 
     //切换代理ip
     ips = getIPs
@@ -30,7 +30,7 @@ object Controller {
     changIP()
 
     //读取源数据文件
-    for (line <- Source.fromFile(args(0))("UTF-8").getLines) {
+    for (line <- Source.fromFile(args(0))("UTF-8").getLines()) {
 
       val lineArr = line.split("\t")
 
@@ -50,16 +50,17 @@ object Controller {
 
             uid = m.group()
 
-            setUid = setUid.+(Array(lineArr(2), uid))
+            setUaAndUid = setUaAndUid.+((lineArr(2), uid))
 
           }
+
           m = pattern.matcher(lineArr(5))
 
           if (m.find()) {
 
             uid = m.group()
 
-            setUid = setUid.+(Array(lineArr(2), uid))
+            setUaAndUid = setUaAndUid.+((lineArr(2), uid))
 
           }
 
@@ -70,7 +71,7 @@ object Controller {
     }
 
     //爬取微博信息并保存
-    WeiBo.crawlWeiBoInfo(setUid)
+    WeiBo.crawlWeiBoInfo(setUaAndUid)
 
   }
 
@@ -78,7 +79,7 @@ object Controller {
    * 用于获取代理IP
    * @return：IP数组
    */
-  def getIPs(): Array[String] = {
+  def getIPs: Array[String] = {
 
     var ipPort: Array[String] = null
 
@@ -118,9 +119,9 @@ object Controller {
 
     println(ip + "  " + port)
 
-    System.getProperties().setProperty("http.proxyHost", ip);
+    System.getProperties.setProperty("http.proxyHost", ip)
 
-    System.getProperties().setProperty("http.proxyPort", port);
+    System.getProperties.setProperty("http.proxyPort", port)
 
   }
 
