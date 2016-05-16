@@ -3,6 +3,7 @@ package com.kunyan.userportrait.importdata.scheduler
 import com.kunyan.userportrait.config.SparkConfig
 import com.kunyan.userportrait.db.{DBOperation, Table}
 import com.kunyan.userportrait.importdata.extractor.Extractor
+import com.kunyan.userportrait.log.PLogger
 import com.kunyan.userportrait.util.StringUtil
 import kafka.serializer.StringDecoder
 import org.apache.spark.sql.SQLContext
@@ -58,6 +59,7 @@ object TimeScheduler {
 
     val result = lineData.flatMap(x => flatMapFun(x._2))
     result.foreachRDD { rdd =>
+
       try {
         println("init..................")
         distinctPhone = distinctPhone.empty
@@ -82,53 +84,53 @@ object TimeScheduler {
           .distinct()
 
         val updateUserInfo = userInfo.map(divideInsertMap).groupByKey()
-        println("divideInsertMap overed...........................")
+        PLogger.warn("divideInsertMap overed...........................")
         val item0 = updateUserInfo.lookup(0)
 
         if(item0.nonEmpty) {
 
           val insertUserInfo = item0.head.filter(filterUserInfo)
-          println("insertIterator size:"+insertUserInfo.size)
-          println("INSERTING.........................")
+          PLogger.warn("insertIterator size:"+insertUserInfo.size)
+          PLogger.warn("INSERTING.........................")
           DBOperation.batchInsert(Array("phone", "qq", "weibo"),insertUserInfo)
-          println("INSERTED.........................")
+          PLogger.warn("INSERTED.........................")
 
         }
         val item1 = updateUserInfo.lookup(1)
         val item2 = updateUserInfo.lookup(2)
         val item3 = updateUserInfo.lookup(3)
-        println("UPDATING...........................")
+        PLogger.warn("UPDATING...........................")
 
         if(item1.nonEmpty) {
 
           val phoneUpdateIterator = item1.head
-          println("phoneUpdateIterator size:"+phoneUpdateIterator.size)
+          PLogger.warn("phoneUpdateIterator size:"+phoneUpdateIterator.size)
           DBOperation.batchUpdate(Array("qq", "weibo"),phoneUpdateIterator)
 
         }
         if(item2.nonEmpty) {
 
           val qqUpdateIterator = item2.head
-          println("qqUpdateIterator size:"+qqUpdateIterator.size)
+          PLogger.warn("qqUpdateIterator size:"+qqUpdateIterator.size)
           DBOperation.batchUpdate(Array("phone", "weibo"),qqUpdateIterator)
 
         }
         if(item3.nonEmpty) {
 
           val weiboUpateIterator = item3.head
-          println ("weiboUpateIterator size:" + weiboUpateIterator.size)
+          PLogger.warn ("weiboUpateIterator size:" + weiboUpateIterator.size)
           DBOperation.batchUpdate (Array ("phone", "qq"), weiboUpateIterator)
 
         }
-        println("updated mysql main_index:")
+        PLogger.warn("updated mysql main_index:")
 
       } catch {
 
         case e: Exception =>
-          println(e.getMessage)
+          PLogger.warn(e.getMessage)
 
       }
-      println("end")
+      PLogger.warn("end")
 
     }
     ssc.start()
