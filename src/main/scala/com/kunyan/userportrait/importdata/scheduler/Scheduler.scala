@@ -2,9 +2,11 @@ package com.kunyan.userportrait.importdata.scheduler
 
 import java.util.Properties
 
+import com.kunyan.personas.database.{DBOperation, Table}
 import com.kunyan.userportrait.config.SparkConfig
-import com.kunyan.userportrait.db.{Table, DBOperation}
+import com.kunyan.userportrait.db.{DBOperation, Table}
 import com.kunyan.userportrait.importdata.extractor.Extractor
+import com.kunyan.userportrait.log.PLogger
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
@@ -41,25 +43,30 @@ object Scheduler extends Serializable {
       val userInfo  = data.map(_.split("\t"))
         .filter(_.length == 8)
         .filter(x => x(6) != "NoDef")
-        .filter(x => x(3).contains("weibo.com") || x(3).contains("suning.com") || x(3).contains("qq.com") || x(3).contains("dianping.com") || x(3).contains("4008823823.com.cn"))
+        .filter(x => x(3).contains("weibo.com") || x(3).contains("suning.com") || x(3).contains("qq.com") ||x(3).contains("youtx.com")
+          || x(3).contains("dianping.com") || x(3).contains("4008823823.com.cn")|| x(3).contains("189.cn") || x(3).contains("jiayuan.com")
+          || x(3).contains("10jqka.com.cn") || x(3).contains("email.163.com") || x(3).contains("baixing.com") || x(3).contains("weidian.com")
+          || x(3).contains("item.yhd.com")|| x(3).contains("order.jd.com")|| x(3).contains("renren.com")|| x(3).contains("eastmoney.com")
+          || x(3).contains("kejiqi.com")|| x(3).contains("music.migu.cn") || x(3).contains("elong.com") || x(3).contains("1zhe.com")
+          || x(3).contains("esf.fangdd.com") || x(3).contains("yougou.com"))
         .map(Extractor.extractorUserInfo)
         .filter(filterUserInfo)
         .distinct().persist(StorageLevel.MEMORY_AND_DISK).repartition(3)
       val updateUserInfo = userInfo.map(divideInsertMap).groupByKey()
       val insertUserInfo = updateUserInfo.lookup(0).head.filter(filterUserInfo)
-      println("insertIterator size:" + insertUserInfo.size)
-      println("INSERTING.........................")
+      PLogger.warn("insertIterator size:" + insertUserInfo.size)
+      PLogger.warn("INSERTING.........................")
       DBOperation.batchInsert(Array("phone", "qq", "weibo"), insertUserInfo)
-      println("INSERTED.........................")
+      PLogger.warn("INSERTED.........................")
       val updatePhone = updateUserInfo.lookup(1)
       val updateQQ = updateUserInfo.lookup(2)
       val updateWeiBo = updateUserInfo.lookup(3)
-      println("UPDATING...........................")
+      PLogger.warn("UPDATING...........................")
 
       if(updatePhone.nonEmpty){
 
         val phoneUpdateIterator = updatePhone.head
-        println("phoneUpdateIterator size:" + phoneUpdateIterator.size)
+        PLogger.warn("phoneUpdateIterator size:" + phoneUpdateIterator.size)
         DBOperation.batchUpdate(Array("qq", "weibo"), phoneUpdateIterator)
 
       }
@@ -67,7 +74,7 @@ object Scheduler extends Serializable {
       if(updateQQ.nonEmpty){
 
         val qqUpdateIterator = updateQQ.head
-        println("qqUpdateIterator size:" + qqUpdateIterator.size)
+        PLogger.warn("qqUpdateIterator size:" + qqUpdateIterator.size)
         DBOperation.batchUpdate(Array("phone", "weibo"), qqUpdateIterator)
 
       }
@@ -75,12 +82,12 @@ object Scheduler extends Serializable {
       if(updateWeiBo.nonEmpty) {
 
         val weiboUpateIterator = updateWeiBo.head
-        println ("weiboUpateIterator size:" + weiboUpateIterator.size)
+        PLogger.warn ("weiboUpateIterator size:" + weiboUpateIterator.size)
         DBOperation.batchUpdate (Array ("phone", "qq"), weiboUpateIterator)
 
       }
 
-      println("updated mysql main_index:")
+      PLogger.warn("updated mysql main_index:")
 
     } catch {
 
@@ -92,7 +99,7 @@ object Scheduler extends Serializable {
 
       }
 
-    println("end")
+    PLogger.warn("end")
 
   }
   def filterUserInfo(x: (String, String, String)): Boolean = {
@@ -119,73 +126,91 @@ object Scheduler extends Serializable {
     if (phone.isEmpty) {
       phone = "Nodef"
     }
-
     if (qq.isEmpty) {
       qq = "Nodef"
     }
-
     if (weibo.isEmpty) {
       weibo = "Nodef"
     }
-    val phoneDataFrame = Table.isExist("phone",phone,DBOperation.connection)
-    val qqDataFrame = Table.isExist("qq",qq,DBOperation.connection)
-    val weiboDataFrame = Table.isExist("weibo",weibo,DBOperation.connection)
-    val noExistInTable = phoneDataFrame._1 == -1 && qqDataFrame._1 == -1 && weiboDataFrame._1 == -1
+
     val isDistinctPhone = distinctPhone.contains(phone)
     val isDistinctQQ = distinctQQ.contains(qq)
     val isDistinctWeibo = distinctWeibo.contains(weibo)
 
-    if (noExistInTable && !isDistinctPhone && !isDistinctQQ && !isDistinctWeibo) {
+    val phoneDataFrame = Table.isExist("phone",phone,DBOperation.connection)
 
-      distinctPhone = distinctPhone.+(phone)
-      distinctQQ = distinctQQ.+(qq)
-      distinctWeibo = distinctWeibo.+(weibo)
-
-      (0, (item._1, item._2, item._3))
-
-    } else if(phoneDataFrame._1 != -1) {
+    if(phoneDataFrame._1 != -1) {
 
       val id = phoneDataFrame._1
 
-      if (qq == "Nodef") {
+      if (qq == "Nodef"){
         qq = phoneDataFrame._3
       }
-      if (weibo == "Nodef") {
+
+      if (weibo == "Nodef"){
         weibo = phoneDataFrame._4
       }
 
-      (1, (qq, weibo, id.toString))
-
-    } else if(qqDataFrame._1 != -1) {
-
-      val id = qqDataFrame._1
-
-      if (phone == "Nodef") {
-        phone = qqDataFrame._2
-      }
-
-      if (weibo == "Nodef") {
-        weibo = qqDataFrame._4
-      }
-
-      (2, (phone, weibo, id.toString))
-
-    }else if(weiboDataFrame._1 != -1) {
-
-      val id = weiboDataFrame._1
-
-      if (phone == "Nodef") {
-        phone = weiboDataFrame._2
-      }
-
-      if (qq == "Nodef") {
-        qq = weiboDataFrame._3
-      }
-
-      (3, (phone, qq, id.toString))
+      (1,(qq, weibo, id.toString))
 
     } else {
-      (0, ("", "", ""))
+
+      val qqDataFrame = Table.isExist("qq",qq,DBOperation.connection)
+
+      if(qqDataFrame._1 != -1) {
+
+        val id = qqDataFrame._1
+
+        if (phone == "Nodef") {
+          phone = qqDataFrame._2
+        }
+
+        if (weibo == "Nodef") {
+          weibo = qqDataFrame._4
+        }
+
+        (2,(phone, weibo, id.toString))
+
+      } else {
+        val weiboDataFrame = Table.isExist("weibo",weibo,DBOperation.connection)
+
+        if(weiboDataFrame._1 != -1) {
+
+          val id = weiboDataFrame._1
+
+          if (phone == "Nodef") {
+            phone = weiboDataFrame._2
+          }
+
+          if (qq == "Nodef") {
+            qq = weiboDataFrame._3
+          }
+
+          (3,(phone, qq, id.toString))
+
+        } else {
+
+          if(!isDistinctPhone && !isDistinctQQ && !isDistinctWeibo){
+
+            if(phone != "Nodef") {
+              distinctPhone = distinctPhone.+(phone)
+            }
+
+            if(qq != "Nodef") {
+              distinctQQ = distinctQQ.+(qq)
+            }
+
+            if(weibo != "Nodef") {
+              distinctWeibo = distinctWeibo.+(weibo)
+            }
+
+            (0,(item._1, item._2, item._3))
+
+          } else {
+            (0,("","",""))
+          }
+        }
+      }
     }
   }
 }
