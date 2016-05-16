@@ -83,7 +83,12 @@ object StringUtil {
     getResult((userId, result))
   }
 
-  def urlDecode(string: String):String ={
+  /**
+    * @param string 源字符串
+    * @return url解码后的字符串
+    * @author youchaojiang
+    */
+  def urlDecode(string: String): String = {
     val decoder  = URLDecoder.decode(string,"utf-8")
     decoder
   }
@@ -91,6 +96,7 @@ object StringUtil {
   /**
     * @param compressedStr 压缩的字符串
     * @return 压缩后的字符串
+    * @author youchaojiang
     */
   private def  zlibUnzip(compressedStr: String ): String = {
 
@@ -118,6 +124,11 @@ object StringUtil {
 
   }
 
+  /**
+    * @param line json字符串
+    * @return 返回json 对象
+    * @author youchaojiang
+    */
   private def getJsonObject(line:String): JSONObject = {
     val data = new JSONObject(line)
     data
@@ -126,17 +137,16 @@ object StringUtil {
   /**
     * @param str  上海电信kv获取的数据
     * @return  返回解析后的数据
+    * @author youchaojiang
     */
-  def parseJsonObject(str:String): String ={
+  def parseJsonObject(str:String): String = {
 
     var finalValue = ""
     try {
       val result = decodeBase64 (str)
-      // println(res)
       val resultSplit = result.split("_kunyan_")
       val json = getJsonObject(resultSplit(0))
       val keyword = resultSplit(1)
-      // println(json)
       val id = json.get ("id").toString
       val value = json.get ("value").toString
       val desDe = zlibUnzip(value.replace("-<","\n"))
@@ -148,8 +158,9 @@ object StringUtil {
       val ref = resultJson(4).replace("\n","")
       val ua = resultJson(5).replace("\n","")
       val cookie = resultJson(6).replace("\n","")
-      // val keyword = resultJson(7)
+
       finalValue = ts + "\t" + ad + "\t" + ua + "\t" + host +"\t"+ url + "\t" + ref + "\t" +cookie + "\t" + keyword
+
     } catch {
       case e:Exception  =>
         println("error parse JSONObject")
