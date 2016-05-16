@@ -3,6 +3,7 @@ package com.kunyan.userportrait.util
 import java.io.ByteArrayOutputStream
 import java.util.zip.InflaterOutputStream
 
+import com.kunyan.userportrait.log.PLogger
 import jodd.util.URLDecoder
 import org.apache.spark.{SparkConf, SparkContext}
 import org.json.JSONObject
@@ -142,6 +143,7 @@ object StringUtil {
   def parseJsonObject(str:String): String = {
 
     var finalValue = ""
+
     try {
       val result = decodeBase64 (str)
       val resultSplit = result.split("_kunyan_")
@@ -163,7 +165,7 @@ object StringUtil {
 
     } catch {
       case e:Exception  =>
-        println("error parse JSONObject")
+        PLogger.warn("error parse JSONObject")
     }
     finalValue
   }
