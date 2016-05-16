@@ -4,7 +4,7 @@ import com.kunyan.userportrait.util.StringUtil
 
 /**
   * Created by C.J.YOU on 2016/4/27.
-  * 解析用户信息的类
+  * 解析电信原始用户数据信息的主类
   */
 object Extractor extends Serializable {
 
@@ -17,6 +17,29 @@ object Extractor extends Serializable {
 
     (phone(arr), qq(arr), weibo(arr))
 
+  }
+
+  /**
+    * @param array 电信原始数据的数组形式
+    * @return  （返回uid，ua，cookie）
+    */
+  def maimaiUserId(array: Array[String]): (String,String,String)  = {
+    var info = ""
+    val cookie = array(6)
+    if (cookie.contains ("koa:sess=")) {
+      try {
+        val arr = cookie.split ("koa:sess=")
+        if (arr.length > 1) {
+          val value = arr(1).split(";")(0)
+          if (value.nonEmpty) {
+            info = StringUtil.getMaimaiUserId(value)
+          }
+        }
+      } catch {
+        case e:Exception => println("maimai userid error")
+      }
+    }
+    (info,array(2),array(6))
   }
 
   /**

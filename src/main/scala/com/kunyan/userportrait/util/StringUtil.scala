@@ -169,4 +169,13 @@ object StringUtil {
     }
     finalValue
   }
+
+  /**
+    * @param line cookie
+    * @return  提取到的用户uid值
+    * @author youchaojiang
+    */
+  def getMaimaiUserId(line:String) : String = {
+    getJsonObject(decodeBase64(line)).get("u").toString
+  }
 }
