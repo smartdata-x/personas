@@ -26,6 +26,8 @@ libraryDependencies += "org.apache.spark" % "spark-core_2.10" % "1.5.2" % "provi
 
 libraryDependencies += "org.apache.spark" % "spark-hive_2.10" % "1.5.2"
 
+libraryDependencies += "org.apache.spark" % "spark-mllib_2.10" % "1.5.2"
+
 libraryDependencies += "org.apache.kafka" % "kafka_2.10" % "0.8.2.1" % "provided"
 
 libraryDependencies += "org.apache.hbase" % "hbase-server" % "1.1.2"
@@ -43,6 +45,10 @@ libraryDependencies += "org.datanucleus" % "datanucleus-core" % "3.2.10" % "prov
 libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.38"
 
 libraryDependencies += "com.google.guava" % "guava" % "14.0.1"
+
+libraryDependencies += "org.apache.spark" % "spark-streaming-kafka_2.10" % "1.5.2"
+
+libraryDependencies += "org.json" % "json" % "20140107"
 
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
