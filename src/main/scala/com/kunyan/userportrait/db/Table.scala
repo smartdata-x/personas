@@ -3,6 +3,7 @@ package com.kunyan.userportrait.db
 import java.sql.Connection
 import java.util.Properties
 
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
 /**
@@ -11,17 +12,40 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
   */
 object Table extends  Serializable {
 
+  @volatile private var instance: Broadcast[DataFrame] = null
+
+  /**
+    * @param sqlc SQLContext
+    * @return  广播数据库表原有数据
+    */
+  def getInstance(sqlc: SQLContext): Broadcast[DataFrame] = {
+    if (instance == null) {
+      synchronized {
+        if (instance == null) {
+          val df = Table.getTableData(sqlc,"jdbc:mysql://222.73.34.91:3306/personas?user=personas&password=personas&useUnicode=true&characterEncoding=utf8","main_index")
+          instance = sqlc.sparkContext.broadcast(df)
+        }
+      }
+    }
+    instance
+  }
+
+  def resetInstance(): Unit = {
+    instance = null
+  }
+
   /**
     * 获取数据库表数据
     * @param sqlc  SQLContext
     * @param readConnection 数据库连接参数
     * @param tableName 数据库表名
     */
-  def getTableData(sqlc: SQLContext, readConnection: String, tableName: String): Unit = {
+  def getTableData(sqlc: SQLContext, readConnection: String, tableName: String): DataFrame = {
 
     val properties = new Properties()
-    properties.setProperty("driver", "com.mysql.jdbc.Driver")
-    sqlc.read.jdbc(readConnection, tableName, properties).registerTempTable(tableName)
+    properties.setProperty("driver","com.mysql.jdbc.Driver")
+    val res = sqlc.read.jdbc(readConnection,tableName,properties).toDF("id","phone","qq","weibo")
+    res
 
   }
 

@@ -1,8 +1,6 @@
 package com.kunyan.userportrait.importdata.scheduler
 
 import java.util.Properties
-
-import com.kunyan.personas.database.{DBOperation, Table}
 import com.kunyan.userportrait.config.SparkConfig
 import com.kunyan.userportrait.db.{DBOperation, Table}
 import com.kunyan.userportrait.importdata.extractor.Extractor
@@ -143,11 +141,11 @@ object Scheduler extends Serializable {
 
       val id = phoneDataFrame._1
 
-      if (qq == "Nodef"){
+      if (qq == "Nodef") {
         qq = phoneDataFrame._3
       }
 
-      if (weibo == "Nodef"){
+      if (weibo == "Nodef") {
         weibo = phoneDataFrame._4
       }
 
@@ -190,7 +188,7 @@ object Scheduler extends Serializable {
 
         } else {
 
-          if(!isDistinctPhone && !isDistinctQQ && !isDistinctWeibo){
+          if(!isDistinctPhone && !isDistinctQQ && !isDistinctWeibo) {
 
             if(phone != "Nodef") {
               distinctPhone = distinctPhone.+(phone)
