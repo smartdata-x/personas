@@ -44,6 +44,8 @@ libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.38"
 
 libraryDependencies += "com.google.guava" % "guava" % "14.0.1"
 
+libraryDependencies += "org.apache.spark" % "spark-mllib_2.10" % "1.5.2"
+
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
   case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
