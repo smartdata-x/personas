@@ -1,7 +1,7 @@
 package com.kunyan.userportrait.temp.lcm.crawler.util
 
-import java.io.IOException
-import java.net.{ConnectException, SocketTimeoutException}
+import java.io._
+import java.net.{ConnectException, SocketException, SocketTimeoutException}
 import java.sql.DriverManager
 import java.util
 import java.util.concurrent.{Executors, TimeUnit}
@@ -11,6 +11,8 @@ import org.jsoup.Connection.Method
 import org.jsoup.{HttpStatusException, Jsoup}
 
 import scala.collection.immutable.HashSet
+import scala.collection.mutable.ListBuffer
+import scala.io.Source
 
 /**
  * Created by lcm on 2016/5/10.
@@ -19,21 +21,39 @@ import scala.collection.immutable.HashSet
  */
 object WeiBo {
 
-  var cookieException = 0
+  var cookies = new ListBuffer[String]
 
   /**
    *
    * @param data：ua和uid的集合
    */
-  def crawlWeiBoInfo(data: HashSet[(String, String)]): Unit = {
+  def crawlWeiBoInfo(data: ListBuffer[(String, String)], outFile: String): Unit = {
 
-    val cookieStr = "SUBP=0033WrSXqPxfM725Ws9jqgMF55529P9D9W59Fnqh3XZYLGbqL7yEge5O5JpX5K2hUgL.Fo2RSK.71Kn4SKBt; UOR=,weibo.com,spr_web_360_hao360_weibo_t001; SINAGLOBAL=3532024244608.283.1463017300810; ULV=1463017300844:1:1:1:3532024244608.283.1463017300810:; SUHB=0btNwX-16L0ipb; ALF=1494553349; un=angelxue3427@msn.com; wvr=6; YF-Ugrow-G0=1eba44dbebf62c27ae66e16d40e02964; login_sid_t=b7309f125841ae04196717bebba28d7b; _s_tentry=-; Apache=3532024244608.283.1463017300810; SUS=SID-1859098954-1463017349-GZ-m5r2g-4f451a0dcc87ebac6a48db72a8e1c66a; SUE=es%3Dcb5da348cff7750570aa8d3748dc9d32%26ev%3Dv1%26es2%3D1e2481db867012e9a24bccdc64509bbc%26rs0%3DVDralZgXwwMzfG3fOCwyWuR4aOv3HkMkEhAqLgoLH2SU6XPDVl3Bj6edqCGzJtou2sWfp0FSMouj51Omv7Ga0xLBe%252FgO4W%252BhaGnArRS3lOdsN5rRwb9EzBPvz%252FageDsKCu6eBJwm2tXQkAb08ju0ta33tBR8Y%252FAgUDGAdeWa3%252BU%253D%26rv%3D0; SUP=cv%3D1%26bt%3D1463017349%26et%3D1463103749%26d%3Dc909%26i%3Dc66a%26us%3D1%26vf%3D0%26vt%3D0%26ac%3D0%26st%3D0%26uid%3D1859098954%26name%3Dangelxue3427%2540msn.com%26nick%3D%25E4%25BD%2595%25E6%25AD%25A2%25E6%2583%25B3%25E4%25BD%25A0%26fmp%3D%26lcp%3D2013-05-06%252011%253A02%253A02; SUB=_2A256N6_VDeRxGedG7lsR-SbFzjiIHXVZRIYdrDV8PUNbuNBeLWXRkW9LHesgckLb12l4N_U4-gKymcKRJQ8hgw..; SSOLoginState=1463017349; YF-V5-G0=1913748929273ee181b5c020a6f91640; YF-Page-G0=59104684d5296c124160a1b451efa4ac"
+    cookies = getCookies
 
     //获取微博用户信息
-    val weiBoInfo = getWeiBoInfo(data, getCookies(cookieStr))
+    val weiBoInfo = getWeiBoInfo(data)
 
     //保存用户信息
-    saveWeiBoInfos(weiBoInfo)
+    saveWeiBoInfos(weiBoInfo, outFile)
+
+
+  }
+
+  /**
+   * 从配置文件读取cookieStr
+   * @return cookieStr
+   */
+  def getCookies: ListBuffer[String] = {
+
+    val cookies = new ListBuffer[String]
+    for (line <- Source.fromFile("/home/liaochengming/crawler/weibo/cookies").getLines()) {
+
+      cookies.+=(line)
+
+    }
+
+    cookies
 
   }
 
@@ -41,16 +61,17 @@ object WeiBo {
    * 将cookie字符串转成map
    * 根据cookie字符串获取cookie的map
    */
-  def getCookies(cookieStr: String): util.HashMap[String, String] = {
+  def getCookieMap: util.HashMap[String, String] = {
 
     val cookieMap = new util.HashMap[String, String]()
+    val cookieStr = cookies((Math.random() * cookies.size).toInt)
     val cookieArr = cookieStr.split(";")
 
     for (line <- cookieArr) {
 
       val lineArr = line.split("=")
-
       if (lineArr.length > 1) {
+
         cookieMap.put(lineArr(0), lineArr(1))
 
       }
@@ -62,32 +83,31 @@ object WeiBo {
 
   /**
    * @param data ： 用于爬取用户信息的id集合
-   * @param cookies：用于发送请求带的参数
    * @return：微博的用户信息集合
    */
-  def getWeiBoInfo(data: HashSet[(String, String)], cookies: util.HashMap[String, String]): HashSet[String] = {
+  def getWeiBoInfo(data: ListBuffer[(String, String)]): HashSet[String] = {
 
     var weiBoInfo = new HashSet[String]
-    val listId = data.toList
+    var info = ""
 
     //创建一个可重用固定线程数的线程池
-    val pool = Executors.newFixedThreadPool(80)
+    val pool = Executors.newFixedThreadPool(6)
 
-    for (index <- listId.indices) {
+    for (index <- data.indices) {
 
       val thread = new Thread(new Runnable {
-
         override def run(): Unit = {
 
           //用url获取id
-          val id = matchAndGetId(listId(index)._1, listId(index)._2, cookies)
+          val id = matchAndGetId(data(index)._1, data(index)._2)
 
           if (id != "") {
 
-            val info = getUserInfoById(cookies, id, listId(index)._1)
+            info = getUserInfoById(id, data(index)._1)
 
             if (info != "") {
 
+              println("info--" + info)
               weiBoInfo = weiBoInfo.+(info)
 
             }
@@ -95,14 +115,14 @@ object WeiBo {
         }
       })
 
-      pool.execute(thread)
+      pool.submit(thread)
 
     }
 
     pool.shutdown()
 
     //停止主线程，等到子多线程运行结束再开启
-    while (!pool.awaitTermination(10, TimeUnit.SECONDS)) {
+    while (!pool.awaitTermination(3, TimeUnit.SECONDS)) {
 
     }
 
@@ -114,38 +134,37 @@ object WeiBo {
    *
    * @param ua：发送请求所需的参数
    * @param uid：用户的微博id
-   * @param cookies：发送请求所需的参数
    * @return：可访问用户信息页面的id
    */
-  def matchAndGetId(ua: String, uid: String, cookies: util.HashMap[String, String]): String = {
+  def matchAndGetId(ua: String, uid: String): String = {
 
     var id = ""
-
     try {
-
       val doc = Jsoup.connect("http://weibo.com/u" + uid)
         .userAgent(ua)
         .timeout(3000)
-        .cookies(cookies)
+        .cookies(getCookieMap)
         .method(Method.GET)
         .followRedirects(true)
         .execute()
-      doc.body().split("\\$CONFIG").foreach(f => {
 
+      doc.body().split("\\$CONFIG").foreach(f => {
         if (f.contains("['page_id']")) {
+
           id = f.replace(";", "").split("=")(1).replace("'", "").trim
+
         }
       })
     }
     catch {
 
-      case ex: SocketTimeoutException => matchAndGetId(ua, uid, cookies)
-      case ex: ConnectException => ex.printStackTrace()
-      case ex: HttpStatusException =>
-        ex.printStackTrace()
+      case ex: SocketTimeoutException => Controller.changIP()
+      case ex: ConnectException => Controller.changIP()
+      case ex: HttpStatusException => Controller.changIP()
+      case ex: SocketException => Controller.changIP()
+      case ex: IOException =>
         Controller.changIP()
-      case ex: IOException => println(ex)
-
+        ex.printStackTrace()
     }
 
     id
@@ -153,13 +172,11 @@ object WeiBo {
   }
 
   /**
-   *
-   * @param cookies：请求所需参数
    * @param id：可访问用户信息页面的id
    * @param ua：请求所需参数
    * @return：用户的微博信息
    */
-  def getUserInfoById(cookies: util.HashMap[String, String], id: String, ua: String): String = {
+  def getUserInfoById(id: String, ua: String): String = {
 
     //用户信息
     var userInfo = ""
@@ -168,41 +185,40 @@ object WeiBo {
     val weiBoId = id.substring(6)
 
     //QQ
-    var QQ = "NoDef"
+    var QQ = " "
 
     //邮箱
-    var email = "NoDef"
+    var email = " "
 
     //职业(不可获得)
-    val job = "NoDef"
+    val job = " "
 
     //身份
-    var position = "NoDef"
+    var position = " "
 
     //真是姓名(不可获得)
-    val realName = "NoDef"
+    val realName = " "
 
     //公司
-    var company = "NoDef"
+    var company = " "
 
     //地址（所在地）
-    var address = "NoDef"
+    var address = " "
 
-    //var
     val url = "http://weibo.com/p/" + id + "/info?mod=pedit_more"
 
     try {
       val doc = Jsoup.connect(url)
         .userAgent(ua)
         .timeout(3000)
-        .cookies(cookies)
+        .cookies(getCookieMap)
         .method(Method.GET)
         .followRedirects(true)
         .execute()
 
       for (x <- doc.body().split("<script>FM.view")) {
-
         if (x.contains("\"ns\":\"\",\"domid\":\"Pl_Official_PersonalInfo__62\"")) {
+
           val data = x.replace("\\t", "").replace("\\n", "").replace("\\r", "")
           val dataArr = data.split("<span class=\\\\\"pt_title S_txt2\\\\\">")
           dataArr.foreach(d => {
@@ -211,6 +227,7 @@ object WeiBo {
             if (d.contains("QQ")) {
 
               QQ = parserInfo("QQ", d)
+              if (QQ.length > 11) QQ = " "
 
             }
 
@@ -218,6 +235,7 @@ object WeiBo {
             if (d.contains("邮箱")) {
 
               email = parserInfo("邮箱", d)
+              if (email.length > 50) email = " "
 
             }
 
@@ -225,6 +243,7 @@ object WeiBo {
             if (d.contains("所在地")) {
 
               address = parserInfo("所在地", d)
+              if (address.length > 50) address = " "
 
             }
 
@@ -233,31 +252,32 @@ object WeiBo {
 
               val workInfo = parserInfo("公司", d).split("=")
               company = workInfo(0)
+              if (company.length > 50) company = " "
 
-              if (workInfo.length == 2) {
+              if (workInfo.length == 2) position = workInfo(1)
 
-                position = workInfo(1)
+              if (position.length > 20) position = " "
 
-              }
             }
           })
         }
       }
 
-      if (address != "NoDef") {
+      if (address != " ") {
 
         userInfo = weiBoId + "-->" + QQ + "-->" + email + "-->" + job + "-->" + position + "-->" + realName + "-->" + company + "-->" + address
 
       }
+
     } catch {
 
-      case ex: SocketTimeoutException => getUserInfoById(cookies, id, ua)
-      case ex: ConnectException => ex.printStackTrace()
-      case ex: HttpStatusException =>
+      case ex: SocketTimeoutException => Controller.changIP()
+      case ex: ConnectException => Controller.changIP()
+      case ex: HttpStatusException => Controller.changIP()
+      case ex: SocketException => Controller.changIP()
+      case ex: IOException =>
         ex.printStackTrace()
         Controller.changIP()
-      case ex: IOException => ex.printStackTrace()
-
     }
 
     userInfo
@@ -277,7 +297,6 @@ object WeiBo {
       val workInfo = infoStr.split("<\\\\/span>")(1)
       val company = workInfo.split("<\\\\/a>")(0).split(">").last
       var position = ""
-
       if (workInfo.contains("职位")) {
 
         position = workInfo.split("职位：").last
@@ -289,10 +308,9 @@ object WeiBo {
     } else {
 
       val anyInfo = infoStr.split("<\\\\/span>")(1).split(">").last
-
       if (anyInfo.contains("pt_detail")) {
 
-        "NoDef"
+        " "
 
       } else {
 
@@ -306,13 +324,17 @@ object WeiBo {
    * 用于保存微博信息
    * @param weiBoInfo：微博用于的信息集合
    */
-  def saveWeiBoInfos(weiBoInfo: HashSet[String]): Unit = {
+  def saveWeiBoInfos(weiBoInfo: HashSet[String], outFile: String): Unit = {
 
     val conn_str = "jdbc:mysql://222.73.34.91:3306/personas?user=personas&password=personas"
+
     classOf[com.mysql.jdbc.Driver]
+
     val conn = DriverManager.getConnection(conn_str)
     val statement = conn.createStatement()
     val wb_weiBoResultSet = statement.executeQuery("SELECT weibo_id FROM weibo")
+
+    val writer = new PrintWriter(outFile)
 
     //获取微博表中微博id,并保存到集合
     var wbWeiBoIdSet = new HashSet[String]
@@ -341,17 +363,16 @@ object WeiBo {
 
       val infoArr = infoStr.split("-->")
       val uid = infoArr(0)
-
       if (wbWeiBoIdSet.contains(uid)) {
 
         //将数据保存到临时空间
+        writer.write(infoStr + "\n")
 
       } else {
 
         if (mainWeiBoIdMap.containsKey(uid)) {
 
           //将数据写到weiBo表中
-
           val prep = conn.prepareStatement("INSERT INTO weibo (main_index_id, weibo_id,qq,email,job,position,realName,company,address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ")
           prep.setInt(1, mainWeiBoIdMap.get(uid))
           prep.setString(2, uid)
@@ -367,13 +388,14 @@ object WeiBo {
         } else {
 
           //将数据保存到临时空间
+          writer.write(infoStr + "\n")
 
         }
       }
     }
 
     conn.close()
-    
-  }
+    writer.close()
 
+  }
 }

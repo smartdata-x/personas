@@ -1,13 +1,14 @@
 package com.kunyan.userportrait.temp.lcm.crawler
 
-import java.net.{SocketException, SocketTimeoutException}
+
+import java.io.IOException
+import java.net.{SocketException, SocketTimeoutException, UnknownHostException}
 import java.util.regex.Pattern
 
 import com.kunyan.userportrait.temp.lcm.crawler.util.WeiBo
 import org.jsoup.{HttpStatusException, Jsoup}
-import parquet.Log
 
-import scala.collection.immutable.HashSet
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 /**
@@ -17,15 +18,23 @@ import scala.io.Source
 object Controller {
 
   val ua = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36 QIHU 360SE se.360.cn"
-  var ips: Array[String] = null
 
+  val ips = new ListBuffer[String]
+
+  /**
+   *
+   * @param args 输入的数据文件和输出的数据文件
+   */
   def main(args: Array[String]) {
 
     //保存微博的信息
-    var setUaAndUid = new HashSet[(String,String)]
+    var listUaAndUid = new ListBuffer[(String, String)]
 
     //切换代理ip
-    ips = getIPs
+    for (id <- 1 to 5) {
+      getIPs
+      Thread.sleep(1000)
+    }
     changIP()
 
     //读取源数据文件
@@ -39,32 +48,48 @@ object Controller {
         if (lineArr(3).contains("weibo.com")) {
 
           //保存单条信息的ua、uid
-          val pattern = Pattern.compile("/\\d+")
+          val pattern = Pattern.compile("/\\d{7,10}")
           var m = pattern.matcher(lineArr(4))
           var uid = ""
 
           if (m.find()) {
 
             uid = m.group()
-            setUaAndUid = setUaAndUid.+((lineArr(2), uid))
+            var have = false
+            listUaAndUid.foreach(line => {
 
+              if (line._2 == uid) have = true
+
+            })
+            if (!have) {
+
+              listUaAndUid = listUaAndUid.+=((lineArr(2), uid))
+
+            }
           }
 
           m = pattern.matcher(lineArr(5))
-
           if (m.find()) {
 
             uid = m.group()
-            setUaAndUid = setUaAndUid.+((lineArr(2), uid))
+            var have = false
+            listUaAndUid.foreach(line => {
 
+              if (line._2 == uid) have = true
+
+            })
+            if (!have) {
+
+              listUaAndUid = listUaAndUid.+=((lineArr(2), uid))
+
+            }
           }
         }
       }
     }
 
     //爬取微博信息并保存
-    WeiBo.crawlWeiBoInfo(setUaAndUid)
-
+    WeiBo.crawlWeiBoInfo(listUaAndUid, args(1))
   }
 
   /**
@@ -74,26 +99,31 @@ object Controller {
   def getIPs: Array[String] = {
 
     var ipPort: Array[String] = null
-
     try {
-
       val doc = Jsoup.connect("http://qsdrk.daili666api.com/ip/?tid=558465838696598&num=500&delay=5&foreign=none&ports=80,8080")
         .userAgent(ua)
         .timeout(30000)
         .followRedirects(true)
         .execute()
+
       ipPort = doc.body().split("\r\n")
+      for (ip <- ipPort) {
+
+        ips.+=(ip)
+
+      }
 
     } catch {
 
       case ex: HttpStatusException => ex.printStackTrace()
       case ex: SocketTimeoutException => ex.printStackTrace()
       case ex: SocketException => ex.printStackTrace()
+      case ex: UnknownHostException => ex.printStackTrace()
+      case ex: IOException => ex.printStackTrace()
 
     }
 
     ipPort
-
   }
 
   /**
@@ -101,14 +131,14 @@ object Controller {
    */
   def changIP(): Unit = {
 
-    val ipPort = ips((Math.random() * 200).toInt).split(":")
+    val ipPort = ips((Math.random() * ips.length).toInt).split(":")
     val ip = ipPort(0)
     val port = ipPort(1)
     System.getProperties.setProperty("http.proxyHost", ip)
     System.getProperties.setProperty("http.proxyPort", port)
 
   }
-
 }
+
 
 
