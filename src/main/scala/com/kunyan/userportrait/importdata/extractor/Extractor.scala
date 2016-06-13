@@ -739,7 +739,7 @@ object Extractor extends Serializable {
 
   }
 
-  /**\
+  /**
     * 获取用户微博号
     * @param array  电信数据按分隔符分隔后的数组
     * @return 用户微博号
