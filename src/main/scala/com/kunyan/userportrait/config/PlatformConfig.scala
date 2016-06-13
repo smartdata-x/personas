@@ -13,4 +13,7 @@ object PlatformConfig {
   val  USER_INFO = 6
   val  HTTP_INFO = 7
 
+  val KFC = 0
+  val MEITUAN = 4
+
 }
