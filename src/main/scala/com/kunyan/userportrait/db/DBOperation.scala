@@ -1,11 +1,11 @@
 package com.kunyan.userportrait.db
 
 import java.sql.{DriverManager, PreparedStatement}
+
 import com.kunyan.userportrait.db.Table.{MaiMai, O2O}
+import com.kunyan.userportrait.log.PLogger
 import org.apache.spark.SparkContext
 
-
-import scala.collection.{IndexedSeq, mutable}
 import scala.collection.mutable.ListBuffer
 
 /**
@@ -324,7 +324,6 @@ object DBOperation extends Serializable{
     */
   def mergeTemp(sparkContext:SparkContext,path: String, tableName: String, tagColumn: String): Unit = {
 
-      // maiami
       val res = sparkContext.textFile(path).map { x =>
         val arr = x.split(",")
         val phone = arr(0).replace("\"", "")
@@ -338,20 +337,21 @@ object DBOperation extends Serializable{
         (phone, email, job, pos, real, com, edu, add)
       }.cache()
 
-      println("count:" + res.count())
+      PLogger.warn("count:" + res.count())
       var index = 1
-      val usePhone = res.foreach { row =>
-      println("index:"+ index)
-      index += 1
-      val phone = row._1.toString
+      val userPhone = res.foreach { row =>
+        PLogger.warn("index:"+ index)
+        index += 1
+        val phone = row._1.toString
         val  id = Table.isExist(tagColumn,phone,connection)._1
         if(id == -1){
           listBuffer.+=((phone,"",""))
         }
-     }
-    println("filter1 over: "+ listBuffer.size)
+      }
+
+    PLogger.warn("filter1 over: "+ listBuffer.size)
     batchInsert(Array("phone","qq","weibo"), listBuffer)
-    println("batchInsert over")
+    PLogger.warn("batchInsert over")
 
     val insert = res.map { x =>
       val phone = x._1
@@ -362,9 +362,9 @@ object DBOperation extends Serializable{
       (maimai,"")
     }.collect()
 
-    println("filter2 over:" + insert.length)
+    PLogger.warn("filter2 over:" + insert.length)
     maiMaiInsert(insert)
-    println("maimai over")
+    PLogger.warn("maimai over")
 
   }
 

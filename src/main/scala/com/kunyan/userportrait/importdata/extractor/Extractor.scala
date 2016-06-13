@@ -20,6 +20,7 @@ object Extractor extends Serializable {
   }
 
   /**
+    * 获取maimai用户的id
     * @param array 电信原始数据的数组形式
     * @return  （返回uid，ua，cookie）
     */

@@ -1,9 +1,7 @@
 package com.kunyan.userportrait.importdata.crawler.task
 
 import java.util
-import java.util.List
-import java.util.ArrayList
-import java.util.concurrent.{Callable, ExecutorCompletionService, Executors, Future}
+import java.util.concurrent.{Callable, Executors, Future}
 
 import com.kunyan.userportrait.log.PLogger
 
@@ -25,14 +23,18 @@ class  MaiMaiSubTask(uidSet: mutable.HashSet[String], ua: String, cookie: String
     PLogger.warn("MaiMaiSubTask Thread:" + Thread.currentThread().getName + ",activeCount:"+Thread.activeCount() + ",getId:"+Thread.currentThread().getId)
 
     for(uid <- uidSet) {
+
       val maiMaiRunable = new MaiMaiSubRunable(uid, ua, cookie)
       tasks.add(maiMaiRunable)
+
     }
     val result:util.List[Future[(String,mutable.HashMap[String,String])]] = subEs.invokeAll(tasks)
 
     for(index <- 0 until result.size){
+
       val res = result.get(index).get()
       set.add(res)
+
     }
     subEs.shutdown()
     set

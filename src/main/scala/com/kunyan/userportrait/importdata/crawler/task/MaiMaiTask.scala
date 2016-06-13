@@ -18,8 +18,10 @@ class  MaiMaiTask(uidSet: mutable.HashSet[String], ua: String, cookie: String) e
     val set = new mutable.HashSet[(String, mutable.HashMap[String,String])]()
     PLogger.warn("Thread:" + Thread.currentThread().getName + ",activeCount:"+Thread.activeCount() + ",getId:"+Thread.currentThread().getId)
     uidSet.foreach( x => {
+
       val info = MaiMaiRequest.sendMaimaiRequest(x, ua, cookie)
       set.+=(info)
+
     })
     set
   }

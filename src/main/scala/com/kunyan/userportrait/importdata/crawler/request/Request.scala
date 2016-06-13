@@ -12,9 +12,11 @@ import org.jsoup.{HttpStatusException, Jsoup}
   * 请求html 处理类
   */
 class Request {
+
   /**
-    * @return  获取代理ip
-     */
+    * 获取代理ip
+    * @return  代理ip的数组
+    */
   def getIPs: Array[String] = {
 
     var ipPort: Array[String] = null
@@ -84,6 +86,13 @@ class Request {
 
   }
 
+  /**
+    * 请求数据
+    * @param ua user agent
+    * @param url url
+    * @param cookie cookie
+    * @return 请求结果
+    */
   def sendRequest(ua:String, url:String, cookie: String): String = {
 
     var res = ""
@@ -98,6 +107,7 @@ class Request {
         .followRedirects(true)
         .execute()
       res = response.body()
+
     } catch {
       case exception: SocketTimeoutException => changIP()
         println("sendRequest time out")

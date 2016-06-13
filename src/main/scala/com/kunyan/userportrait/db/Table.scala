@@ -9,6 +9,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
 /**
   * Created by C.J.YOU on 2016/4/26.
+  * 数据库表操作
   */
 object Table extends  Serializable{
 
@@ -130,6 +131,13 @@ object Table extends  Serializable{
 
   }
 
+  /**
+    * 判断Maimai数据库是否存在数据
+    * @param col 列名
+    * @param param 参数
+    * @param conn 连接字符串
+    * @return 查询的结果
+    */
   def isExistMaiMai(col: String, param: String, conn: Connection): (Int, String) = {
 
     val st = conn.createStatement

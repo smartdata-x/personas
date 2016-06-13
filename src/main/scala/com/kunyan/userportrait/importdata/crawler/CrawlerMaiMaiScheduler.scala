@@ -23,7 +23,6 @@ import scala.collection.mutable.ListBuffer
 object CrawlerMaiMaiScheduler {
 
   val sparkConf = new SparkConf()
-    .setMaster("local")
     .setAppName("USER")
     .set("spark.serializer",SparkConfig.SPARK_SERIALIZER)
     .set("spark.kryoserializer.buffer.max",SparkConfig.SPARK_KRYOSERIALIZER_BUFFER_MAX)
@@ -45,6 +44,7 @@ object CrawlerMaiMaiScheduler {
     val rdd = sc.textFile(args(0))
     val data = rdd.distinct()
     PLogger.warn("start extract user info:")
+
     val userInfo  = data.map(_.split("\t"))
       .filter(_.length == 8)
       .filter(x => x(6) != "NoDef")
@@ -77,7 +77,10 @@ object CrawlerMaiMaiScheduler {
           userMapListBuffer.+=(x._2)
         }
       }
-      /** reduce mysql search frequecncy **/
+
+      /**
+        * reduce mysql search frequecncy
+        */
       userMapListBuffer.foreach { map =>
         val phone = if(map.contains("手机号") && !map.get("手机号").get.contains("好友级别可见")) map.get("手机号").get else "Nodef"
         if(!userKeyMap.contains(phone))
@@ -99,12 +102,18 @@ object CrawlerMaiMaiScheduler {
       PLogger.warn("解析完毕，开始写入数据库..................")
       val exist = userMaiMaiList.filter(x => x._1.mainIndex != -1)
       val noExist = userMaiMaiList.filter(x => x._1.mainIndex == -1).filter(x => x._1.phone != "Nodef")
-      /** sync main_index **/
+
+      /**
+        * sync main_index
+        */
       val updateMain = noExist.map(x =>(x._1.phone,"",""))
       DBOperation.batchInsert(Array("phone","qq","weibo"),updateMain)
       DBOperation.maiMaiInsert(exist)
       PLogger.warn("写入数据库完毕..................:" + exist.size)
-      /** 不更新tmp表 **/
+
+      /**
+        * 不更新tmp表
+        */
       val newExist = noExist.map(x => {
         x._1.mainIndex = Table.isExist("phone",x._1.phone,DBOperation.connection)._1
         x
@@ -131,7 +140,6 @@ object CrawlerMaiMaiScheduler {
 
   /**
     * 获取main_index 中的id号
- *
     * @param map 解析好的数据map集合
     * @return  返回一个case类和数据库表对应, 格式化后用户信息字符串
     */
@@ -160,13 +168,4 @@ object CrawlerMaiMaiScheduler {
     (maiMai,info)
 
   }
-
-  def getUserInfoTuple(future: Future[mutable.HashSet[(String,mutable.HashMap[String,String])]]): mutable.HashSet[(String,mutable.HashMap[String,String])] = {
-    future.get()
-  }
-
-  def insertToDB(info: (String, mutable.HashMap[String, String])): (MaiMai, String) = {
-    getMaiMainMainIndex(info._2)
-  }
-
 }
