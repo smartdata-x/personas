@@ -40,7 +40,7 @@ object CrawlerMaiMaiScheduler {
 
     val thread = 12
     val es = Executors.newFixedThreadPool(thread)
-    val compService  = new ExecutorCompletionService[mutable.HashSet[(String, mutable.HashMap[String,String])]](es)
+    val compService  = new ExecutorCompletionService[mutable.HashSet[(String, mutable.HashMap[String, String])]](es)
     val rdd = sc.textFile(args(0))
     val data = rdd.distinct()
     PLogger.warn("start extract user info:")
@@ -78,9 +78,6 @@ object CrawlerMaiMaiScheduler {
         }
       }
 
-      /**
-        * reduce mysql search frequecncy
-        */
       userMapListBuffer.foreach { map =>
         val phone = if(map.contains("手机号") && !map.get("手机号").get.contains("好友级别可见")) map.get("手机号").get else "Nodef"
         if(!userKeyMap.contains(phone))
@@ -103,17 +100,11 @@ object CrawlerMaiMaiScheduler {
       val exist = userMaiMaiList.filter(x => x._1.mainIndex != -1)
       val noExist = userMaiMaiList.filter(x => x._1.mainIndex == -1).filter(x => x._1.phone != "Nodef")
 
-      /**
-        * sync main_index
-        */
       val updateMain = noExist.map(x =>(x._1.phone,"",""))
       DBOperation.batchInsert(Array("phone","qq","weibo"),updateMain)
       DBOperation.maiMaiInsert(exist)
       PLogger.warn("写入数据库完毕..................:" + exist.size)
 
-      /**
-        * 不更新tmp表
-        */
       val newExist = noExist.map(x => {
         x._1.mainIndex = Table.isExist("phone",x._1.phone,DBOperation.connection)._1
         x
@@ -161,6 +152,7 @@ object CrawlerMaiMaiScheduler {
     if(address == "Nodef") {
       address = if(map.contains("地区")) map.get("地区").get else ""
     }
+
     val maimai = MaiMai(mainIndexId,phone,email,job,position,realName,company,education,address)
     maiMai = maimai
     info = realName + "\t" + phone +  "\t" + email +  "\t" +  position +  "\t" + job +  "\t" + address +  "\t" + company +  "\t" + education

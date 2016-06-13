@@ -109,10 +109,12 @@ class Request {
       res = response.body()
 
     } catch {
+
       case exception: SocketTimeoutException => changIP()
         println("sendRequest time out")
       case exception: HttpStatusException => println("HttpStatusException out")
       case exception: Exception => println("sendRequest time out")
+
     }
 
     res
