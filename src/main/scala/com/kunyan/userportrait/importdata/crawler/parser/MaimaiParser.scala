@@ -3,6 +3,7 @@ package com.kunyan.userportrait.importdata.crawler.parser
 import org.jsoup.Jsoup
 
 import scala.collection.mutable
+
 /**
   * Created by C.J.YOU on 2016/5/16.
   * 解析maimai网页数据的主类
@@ -53,6 +54,7 @@ object MaiMaiParser {
     }
 
     try {
+
         val company = html.body().getElementsByClass("panel-default")
 
         for(c <- 0 until company.size()) {

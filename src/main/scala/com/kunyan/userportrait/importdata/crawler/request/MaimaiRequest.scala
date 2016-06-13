@@ -7,7 +7,7 @@ import com.kunyan.userportrait.log.PLogger
 import org.jsoup.HttpStatusException
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
+
 
 /**
   * Created by C.J.YOU on 2016/5/16.
@@ -24,6 +24,7 @@ object MaiMaiRequest  extends  Request {
   def requestForUserInfo(url: String, ua: String, cookie: String): String = {
 
     var res = ""
+
     try {
 
       if(cookie.nonEmpty) {
