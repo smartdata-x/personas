@@ -15,9 +15,9 @@ object MaiMaiParser {
     * @param string 网页源数据
     * @return 解析后的结果(个人信息字符串,包含个人信息的map)
     */
-  def extractorInfo(string: String): (String, mutable.HashMap[String,String]) = {
+  def extractorInfo(string: String): (String, mutable.HashMap[String, String]) = {
 
-    val  infoMap = new mutable.HashMap[String,String]
+    val  infoMap = new mutable.HashMap[String, String]
     var info = ""
     val html = Jsoup.parse(string)
 
@@ -47,10 +47,13 @@ object MaiMaiParser {
           infoMap.+=(("姓名", name))
           infoMap.+=(("职位", position))
           infoMap.+=(("工作", job))
+
         }
       }
     }catch {
+
       case e:Exception =>
+
     }
 
     try {
@@ -65,22 +68,26 @@ object MaiMaiParser {
         }
 
     } catch {
+
         case e:Exception =>
+
     } finally {
 
       infoMap.foreach { x =>
 
         val key = x._1
         val value = x._2
+
         if(info.nonEmpty) {
           info = info + "\t" + key + ":" + value
-        }else {
+        } else {
           info = key + ":"+ value
         }
       }
     }
 
     (info,infoMap)
+
   }
 
   /**

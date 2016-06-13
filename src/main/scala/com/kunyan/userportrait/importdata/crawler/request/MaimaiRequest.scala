@@ -32,8 +32,10 @@ object MaiMaiRequest  extends  Request {
       }
 
     } catch {
+
       case exception: SocketTimeoutException => changIP()
       case exception: Exception => PLogger.warn("requestForUserInfo exception")
+
     }
 
     res
@@ -46,7 +48,7 @@ object MaiMaiRequest  extends  Request {
     * @param cookie 用户cookie
     * @return 返回网页数据
     */
-  def sendMaimaiRequest(uid: String, ua: String, cookie: String): (String, mutable.HashMap[String,String])  = {
+  def sendMaimaiRequest(uid: String, ua: String, cookie: String): (String, mutable.HashMap[String, String])  = {
 
     // Thread.sleep(1000)  // 使用流处理的话这个需要注释掉
 
@@ -84,9 +86,11 @@ object MaiMaiRequest  extends  Request {
         index += 15
       }
     } catch {
+
       case exception: HttpStatusException => PLogger.warn("contact list fetch over")
       case exception: SocketTimeoutException => changIP()
       case exception: Exception => PLogger.warn("sendRequest out")
+
     }
 
     uidHashSet
