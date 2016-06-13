@@ -17,9 +17,9 @@ import scala.io.Source
  */
 object Controller {
 
-  val ua = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36 QIHU 360SE se.360.cn"
+  val UA = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36 QIHU 360SE se.360.cn"
 
-  val ips = new ListBuffer[String]
+  val IPS = new ListBuffer[String]
 
   /**
    *
@@ -101,7 +101,7 @@ object Controller {
     var ipPort: Array[String] = null
     try {
       val doc = Jsoup.connect("http://qsdrk.daili666api.com/ip/?tid=558465838696598&num=500&delay=5&foreign=none&ports=80,8080")
-        .userAgent(ua)
+        .userAgent(UA)
         .timeout(30000)
         .followRedirects(true)
         .execute()
@@ -109,7 +109,7 @@ object Controller {
       ipPort = doc.body().split("\r\n")
       for (ip <- ipPort) {
 
-        ips.+=(ip)
+        IPS.+=(ip)
 
       }
 
@@ -131,7 +131,7 @@ object Controller {
    */
   def changIP(): Unit = {
 
-    val ipPort = ips((Math.random() * ips.length).toInt).split(":")
+    val ipPort = IPS((Math.random() * IPS.length).toInt).split(":")
     val ip = ipPort(0)
     val port = ipPort(1)
     System.getProperties.setProperty("http.proxyHost", ip)
