@@ -43,7 +43,6 @@ object Table extends  Serializable {
 
   /**
     * 获取数据库数据生成广播变量
- *
     * @param sqlc SQLContext
     * @return 广播主表数据
     */
@@ -75,7 +74,6 @@ object Table extends  Serializable {
 
   /**
     * 加载数据库数据
- *
     * @param sqlc SQLContext
     * @param readConnection 数据连接字符串
     * @param tableName 表名
@@ -93,7 +91,6 @@ object Table extends  Serializable {
 
   /**
     * 写入数据库
- *
     * @param dataFrame  需要写入数据的DF
     * @param writeConnection 连接字符串
     * @param tableName 表名
@@ -108,7 +105,6 @@ object Table extends  Serializable {
 
   /**
     * 判断数据库是否存在数据
- *
     * @param col 列名
     * @param param 参数
     * @param conn 连接字符串
@@ -137,7 +133,6 @@ object Table extends  Serializable {
 
   /**
     * 判断Maimai数据库是否存在数据
- *
     * @param col 列名
     * @param param 参数
     * @param conn 连接字符串
