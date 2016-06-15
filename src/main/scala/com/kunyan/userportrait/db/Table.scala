@@ -13,10 +13,11 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
   */
 object Table extends  Serializable {
 
+  // 对应数据库中main_index表结构
   case class MainIndex(phone: String, qq: String, weibo: String)
-
+  // 对应数据库中maimai表结构
   case  class MaiMai(var mainIndex: Int, var phone: String, email: String, job: String, position: String, realName: String, company: String, education: String, address: String )
-
+  // 对应数据库中O2O表结构
   case class O2O(var mainIndex: Int, var phone: String, email: String,realName: String, address: String)
 
   /**

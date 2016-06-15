@@ -206,7 +206,7 @@ object DBOperation extends Serializable {
 
     } catch {
 
-      case e: Exception => PLogger.warn("Mysql:"+e.getMessage)
+      case e: Exception => PLogger warn "Mysql:" + e.getMessage
 
     } finally {
 

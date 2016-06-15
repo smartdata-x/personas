@@ -11,7 +11,6 @@ object Extractor extends Serializable {
 
   /**
     * 解析出用户phone，qq，微博号
-    *
     * @param arr 电信数据按分隔符分隔后的数组
     * @return 用户信息元组
     */
@@ -23,7 +22,6 @@ object Extractor extends Serializable {
 
   /**
     * 获取maimai用户的id
-    *
     * @param array 电信原始数据的数组形式
     * @return  （返回uid，ua，cookie）
     */
@@ -717,7 +715,6 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户微博号
-    *
     * @param array  电信数据按分隔符分隔后的数组
     * @return 用户微博号
     */
@@ -767,7 +764,6 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户qq号
-    *
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户qq
     */
@@ -926,7 +922,6 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户邮箱
-    *
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户邮箱
     */
