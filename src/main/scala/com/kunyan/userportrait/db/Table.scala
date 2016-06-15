@@ -3,7 +3,6 @@ package com.kunyan.userportrait.db
 import java.sql.Connection
 import java.util.Properties
 
-import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
 
@@ -18,7 +17,7 @@ object Table extends  Serializable {
   // 对应数据库中maimai表结构
   case  class MaiMai(var mainIndex: Int, var phone: String, email: String, job: String, position: String, realName: String, company: String, education: String, address: String )
   // 对应数据库中O2O表结构
-  case class O2O(var mainIndex: Int, var phone: String, email: String,realName: String, address: String)
+  case class WaiMai(var mainIndex: Int, var phone: String, email: String, realName: String, address: String)
 
   /**
     * @param maiMai  MaiMai实例
@@ -34,7 +33,7 @@ object Table extends  Serializable {
     * @param o2O O2O实例
     * @return 格式化后用户信息
     */
-  def toString(o2O: O2O): String = {
+  def toString(o2O: WaiMai): String = {
 
     o2O.realName + "\t" + o2O.phone +  "\t" + o2O.email + "\t" + o2O.address
 
@@ -44,6 +43,7 @@ object Table extends  Serializable {
 
   /**
     * 获取数据库数据生成广播变量
+ *
     * @param sqlc SQLContext
     * @return 广播主表数据
     */
@@ -75,6 +75,7 @@ object Table extends  Serializable {
 
   /**
     * 加载数据库数据
+ *
     * @param sqlc SQLContext
     * @param readConnection 数据连接字符串
     * @param tableName 表名
@@ -92,6 +93,7 @@ object Table extends  Serializable {
 
   /**
     * 写入数据库
+ *
     * @param dataFrame  需要写入数据的DF
     * @param writeConnection 连接字符串
     * @param tableName 表名
@@ -106,6 +108,7 @@ object Table extends  Serializable {
 
   /**
     * 判断数据库是否存在数据
+ *
     * @param col 列名
     * @param param 参数
     * @param conn 连接字符串
@@ -134,6 +137,7 @@ object Table extends  Serializable {
 
   /**
     * 判断Maimai数据库是否存在数据
+ *
     * @param col 列名
     * @param param 参数
     * @param conn 连接字符串
