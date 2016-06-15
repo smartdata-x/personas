@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 /**
   * Created by C.J.YOU on 2016/4/26.
   */
-object DBOperation extends Serializable{
+object DBOperation extends Serializable {
 
   val url = "jdbc:mysql://xxxx:3306/personas?user=personas&password=personas&useUnicode=true&characterEncoding=utf8"
   val driver = "com.mysql.jdbc.Driver"
@@ -61,6 +61,7 @@ object DBOperation extends Serializable{
     * @param iterator 需更新的数据迭代器
     */
   def batchUpdate(columns:Array[String], iterator: Iterable[(String, String,String)]): Unit = {
+
     var ps: PreparedStatement = null
     val sql = "update main_index set " + columns (0) + " = ?," + columns (1) + "= ? where id = ?"
 
@@ -178,7 +179,8 @@ object DBOperation extends Serializable{
     * 插入与main_index 表没有手机号码关联的数据
     * @param list 与数据库personas中maimai_tmp表对应的case类
     */
-  def maiMaiTempInsert(list: ListBuffer[(MaiMai,String)]): Unit ={
+  def maiMaiTempInsert(list: ListBuffer[(MaiMai,String)]): Unit = {
+
     var ps: PreparedStatement = null
     val sql ="insert into maimai_tmp (phone,email,job,position,real_name,company,education,address) values (?,?,?,?,?,?,?,?)"
     ps = connection.prepareStatement(sql)
@@ -214,7 +216,13 @@ object DBOperation extends Serializable{
     }
   }
 
+  /**
+    * o2o 平台数据的更新
+    * @param list 用户信息数组
+    * @param typeTag o2o平台分类标签
+    */
   def O2OInsert(list: ListBuffer[(O2O,String)],typeTag: Int): Unit = {
+
     var ps: PreparedStatement = null
     val sql = "insert into O2O(main_index_id,phone,email,real_name,address,platform) values (?,?,?,?,?,?)"
     ps = connection.prepareStatement(sql)
@@ -250,6 +258,7 @@ object DBOperation extends Serializable{
     * @param typeTag o2o平台分类标签
     */
   def O2OInsert(list: Array[(O2O,String)],typeTag: Int): Unit = {
+
     var ps: PreparedStatement = null
     val sql = "insert into O2O(main_index_id,phone,email,real_name,address,platform) values (?,?,?,?,?,?)"
     ps = connection.prepareStatement(sql)
@@ -286,6 +295,7 @@ object DBOperation extends Serializable{
     * @param list 用户数据集合
     */
   def O2OTmpInsert(list: ListBuffer[(O2O,String)]): Unit = {
+
     var ps: PreparedStatement = null
     val sql = "insert into O2O_tmp (phone,email,real_name,address,platform) values (?,?,?,?,?)"
     ps = connection.prepareStatement(sql)

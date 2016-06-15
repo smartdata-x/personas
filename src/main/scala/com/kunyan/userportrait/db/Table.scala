@@ -11,7 +11,7 @@ import org.apache.spark.sql.{DataFrame, SQLContext, SaveMode}
   * Created by C.J.YOU on 2016/4/26.
   * 数据库表操作
   */
-object Table extends  Serializable{
+object Table extends  Serializable {
 
   case class MainIndex(phone: String, qq: String, weibo: String)
 
