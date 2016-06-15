@@ -4,6 +4,7 @@ import java.net.{SocketException, SocketTimeoutException}
 import java.util
 import java.util.Random
 
+import com.kunyan.userportrait.log.PLogger
 import org.jsoup.Connection.Method
 import org.jsoup.{HttpStatusException, Jsoup}
 
@@ -31,9 +32,9 @@ class Request {
     } catch {
 
       case ex: HttpStatusException => changIP()
-      case ex: SocketTimeoutException => println(ex)
-      case ex: SocketException => println(ex)
-      case ex: Exception => println("getIPs error")
+      case ex: SocketTimeoutException => PLogger.exception(ex)
+      case ex: SocketException => PLogger.exception(ex)
+      case ex: Exception => PLogger.warn("getIPs error")
 
     }
 
@@ -53,13 +54,13 @@ class Request {
       val ip = ipPort(0)
       val port = ipPort(1)
 
-      println(ip + "  " + port)
+      PLogger.warn(ip + "  " + port)
 
       System.getProperties.setProperty("http.proxyHost", ip)
       System.getProperties.setProperty("http.proxyPort", port)
 
     } catch {
-      case e:Exception => println("changIP error")
+      case e:Exception => PLogger.warn("changIP error")
     }
 
   }
@@ -111,9 +112,9 @@ class Request {
     } catch {
 
       case exception: SocketTimeoutException => changIP()
-        println("sendRequest time out")
-      case exception: HttpStatusException => println("HttpStatusException out")
-      case exception: Exception => println("sendRequest time out")
+        PLogger.warn("sendRequest time out")
+      case exception: HttpStatusException => PLogger.warn("HttpStatusException out")
+      case exception: Exception => PLogger.warn("sendRequest time out")
 
     }
 

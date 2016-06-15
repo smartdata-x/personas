@@ -45,7 +45,7 @@ object DBOperation extends Serializable {
       ps.executeBatch()
     } catch {
 
-      case e: Exception => println("Mysql Exception")
+      case e: Exception => PLogger.warn("Mysql Exception")
 
     } finally {
 
@@ -81,7 +81,7 @@ object DBOperation extends Serializable {
 
     } catch {
 
-      case e: Exception => println("Mysql Exception")
+      case e: Exception => PLogger.warn("Mysql Exception")
 
     } finally {
 
@@ -123,7 +123,7 @@ object DBOperation extends Serializable {
 
     } catch {
 
-      case e: Exception => println("Mysql:"+e.getMessage)
+      case e: Exception => PLogger.warn("Mysql:"+e.getMessage)
 
     } finally {
 
@@ -165,7 +165,7 @@ object DBOperation extends Serializable {
 
     } catch {
 
-      case e: Exception => println("Mysql:" + e.getMessage)
+      case e: Exception => PLogger.warn("Mysql:" + e.getMessage)
 
     } finally {
 
@@ -206,7 +206,7 @@ object DBOperation extends Serializable {
 
     } catch {
 
-      case e: Exception => println("Mysql:"+e.getMessage)
+      case e: Exception => PLogger.warn("Mysql:"+e.getMessage)
 
     } finally {
 
@@ -243,7 +243,9 @@ object DBOperation extends Serializable {
       ps.executeBatch()
 
     } catch {
-      case e: Exception => println("Mysql:" + e.getMessage)
+
+      case e: Exception => PLogger.warn("Mysql:" + e.getMessage)
+
     } finally {
 
       if (ps != null) {
@@ -281,7 +283,9 @@ object DBOperation extends Serializable {
       ps.executeBatch()
 
     } catch {
-      case e: Exception => println("Mysql:" + e.getMessage)
+
+      case e: Exception => PLogger.warn("Mysql:" + e.getMessage)
+
     } finally {
 
       if (ps != null) {
@@ -317,7 +321,9 @@ object DBOperation extends Serializable {
       ps.executeBatch()
 
     } catch {
-      case e: Exception => println("Mysql:" + e.getMessage)
+
+      case e: Exception => PLogger.warn("Mysql:" + e.getMessage)
+
     } finally {
 
       if (ps != null) {

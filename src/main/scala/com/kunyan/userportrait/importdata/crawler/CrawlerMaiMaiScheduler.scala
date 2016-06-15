@@ -62,7 +62,6 @@ object CrawlerMaiMaiScheduler {
         val x = userInfo(index)
         val contactList = MaiMaiRequest.getContactListDetail(x._2, x._3)
         contactList.+=(x._1)
-        println(contactList)
         val task = new MaiMaiSubTask(contactList, x._2, x._3)
         compService.submit(task)
 

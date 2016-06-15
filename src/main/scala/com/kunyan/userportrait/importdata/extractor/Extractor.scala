@@ -41,7 +41,7 @@ object Extractor extends Serializable {
           }
         }
       } catch {
-        case e:Exception => println("maimai userid error")
+        case e:Exception => PLogger.warn("maimai userid error")
       }
     }
     (info,array(2),array(6))
@@ -572,7 +572,7 @@ object Extractor extends Serializable {
             }
           }
         } catch {
-          case e:Exception => println("dian ping phone error")
+          case e:Exception => PLogger.warn("dian ping phone error")
         }
       }
 
