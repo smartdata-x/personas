@@ -32,9 +32,12 @@ object Controller {
 
     //切换代理ip
     for (id <- 1 to 5) {
+
       getIPs
       Thread.sleep(1000)
+
     }
+
     changIP()
 
     //读取源数据文件
@@ -56,11 +59,13 @@ object Controller {
 
             uid = m.group()
             var have = false
+
             listUaAndUid.foreach(line => {
 
               if (line._2 == uid) have = true
 
             })
+
             if (!have) {
 
               listUaAndUid = listUaAndUid.+=((lineArr(2), uid))
@@ -69,15 +74,18 @@ object Controller {
           }
 
           m = pattern.matcher(lineArr(5))
+
           if (m.find()) {
 
             uid = m.group()
             var have = false
+
             listUaAndUid.foreach(line => {
 
               if (line._2 == uid) have = true
 
             })
+
             if (!have) {
 
               listUaAndUid = listUaAndUid.+=((lineArr(2), uid))
@@ -99,7 +107,9 @@ object Controller {
   def getIPs: Array[String] = {
 
     var ipPort: Array[String] = null
+
     try {
+
       val doc = Jsoup.connect("http://qsdrk.daili666api.com/ip/?tid=558465838696598&num=500&delay=5&foreign=none&ports=80,8080")
         .userAgent(UA)
         .timeout(30000)
@@ -107,6 +117,7 @@ object Controller {
         .execute()
 
       ipPort = doc.body().split("\r\n")
+
       for (ip <- ipPort) {
 
         IPS.+=(ip)
@@ -116,9 +127,13 @@ object Controller {
     } catch {
 
       case ex: HttpStatusException => ex.printStackTrace()
+
       case ex: SocketTimeoutException => ex.printStackTrace()
+
       case ex: SocketException => ex.printStackTrace()
+
       case ex: UnknownHostException => ex.printStackTrace()
+
       case ex: IOException => ex.printStackTrace()
 
     }
@@ -134,6 +149,7 @@ object Controller {
     val ipPort = IPS((Math.random() * IPS.length).toInt).split(":")
     val ip = ipPort(0)
     val port = ipPort(1)
+
     System.getProperties.setProperty("http.proxyHost", ip)
     System.getProperties.setProperty("http.proxyPort", port)
 

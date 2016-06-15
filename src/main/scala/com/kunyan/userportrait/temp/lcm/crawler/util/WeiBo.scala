@@ -21,7 +21,7 @@ import scala.io.Source
  */
 object WeiBo {
 
-  var cookies = new ListBuffer[String]
+  var Cookies = new ListBuffer[String]
 
   /**
    *
@@ -29,7 +29,7 @@ object WeiBo {
    */
   def crawlWeiBoInfo(data: ListBuffer[(String, String)], outFile: String): Unit = {
 
-    cookies = getCookies
+    Cookies = getCookies
 
     //获取微博用户信息
     val weiBoInfo = getWeiBoInfo(data)
@@ -47,6 +47,7 @@ object WeiBo {
   def getCookies: ListBuffer[String] = {
 
     val cookies = new ListBuffer[String]
+
     for (line <- Source.fromFile("/home/liaochengming/crawler/weibo/cookies").getLines()) {
 
       cookies.+=(line)
@@ -54,7 +55,6 @@ object WeiBo {
     }
 
     cookies
-
   }
 
   /**
@@ -64,12 +64,13 @@ object WeiBo {
   def getCookieMap: util.HashMap[String, String] = {
 
     val cookieMap = new util.HashMap[String, String]()
-    val cookieStr = cookies((Math.random() * cookies.size).toInt)
+    val cookieStr = Cookies((Math.random() * Cookies.size).toInt)
     val cookieArr = cookieStr.split(";")
 
     for (line <- cookieArr) {
 
       val lineArr = line.split("=")
+
       if (lineArr.length > 1) {
 
         cookieMap.put(lineArr(0), lineArr(1))
@@ -78,7 +79,6 @@ object WeiBo {
     }
 
     cookieMap
-
   }
 
   /**
@@ -96,6 +96,7 @@ object WeiBo {
     for (index <- data.indices) {
 
       val thread = new Thread(new Runnable {
+
         override def run(): Unit = {
 
           //用url获取id
@@ -107,7 +108,6 @@ object WeiBo {
 
             if (info != "") {
 
-              println("info--" + info)
               weiBoInfo = weiBoInfo.+(info)
 
             }
@@ -116,7 +116,6 @@ object WeiBo {
       })
 
       pool.submit(thread)
-
     }
 
     pool.shutdown()
@@ -139,7 +138,9 @@ object WeiBo {
   def matchAndGetId(ua: String, uid: String): String = {
 
     var id = ""
+
     try {
+
       val doc = Jsoup.connect("http://weibo.com/u" + uid)
         .userAgent(ua)
         .timeout(3000)
@@ -149,26 +150,32 @@ object WeiBo {
         .execute()
 
       doc.body().split("\\$CONFIG").foreach(f => {
+
         if (f.contains("['page_id']")) {
 
           id = f.replace(";", "").split("=")(1).replace("'", "").trim
 
         }
+
       })
     }
     catch {
 
       case ex: SocketTimeoutException => Controller.changIP()
+
       case ex: ConnectException => Controller.changIP()
+
       case ex: HttpStatusException => Controller.changIP()
+
       case ex: SocketException => Controller.changIP()
+
       case ex: IOException =>
         Controller.changIP()
         ex.printStackTrace()
+
     }
 
     id
-
   }
 
   /**
@@ -208,6 +215,7 @@ object WeiBo {
     val url = "http://weibo.com/p/" + id + "/info?mod=pedit_more"
 
     try {
+
       val doc = Jsoup.connect(url)
         .userAgent(ua)
         .timeout(3000)
@@ -217,10 +225,12 @@ object WeiBo {
         .execute()
 
       for (x <- doc.body().split("<script>FM.view")) {
+
         if (x.contains("\"ns\":\"\",\"domid\":\"Pl_Official_PersonalInfo__62\"")) {
 
           val data = x.replace("\\t", "").replace("\\n", "").replace("\\r", "")
           val dataArr = data.split("<span class=\\\\\"pt_title S_txt2\\\\\">")
+
           dataArr.foreach(d => {
 
             //获取QQ信息
@@ -252,6 +262,7 @@ object WeiBo {
 
               val workInfo = parserInfo("公司", d).split("=")
               company = workInfo(0)
+
               if (company.length > 50) company = " "
 
               if (workInfo.length == 2) position = workInfo(1)
@@ -272,16 +283,21 @@ object WeiBo {
     } catch {
 
       case ex: SocketTimeoutException => Controller.changIP()
+
       case ex: ConnectException => Controller.changIP()
+
       case ex: HttpStatusException => Controller.changIP()
+
       case ex: SocketException => Controller.changIP()
+
       case ex: IOException =>
+
         ex.printStackTrace()
         Controller.changIP()
+
     }
 
     userInfo
-
   }
 
   /**
@@ -297,6 +313,7 @@ object WeiBo {
       val workInfo = infoStr.split("<\\\\/span>")(1)
       val company = workInfo.split("<\\\\/a>")(0).split(">").last
       var position = ""
+
       if (workInfo.contains("职位")) {
 
         position = workInfo.split("职位：").last
@@ -308,6 +325,7 @@ object WeiBo {
     } else {
 
       val anyInfo = infoStr.split("<\\\\/span>")(1).split(">").last
+
       if (anyInfo.contains("pt_detail")) {
 
         " "
@@ -363,6 +381,7 @@ object WeiBo {
 
       val infoArr = infoStr.split("-->")
       val uid = infoArr(0)
+
       if (wbWeiBoIdSet.contains(uid)) {
 
         //将数据保存到临时空间
