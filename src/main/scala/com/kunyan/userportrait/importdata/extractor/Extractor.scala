@@ -11,6 +11,7 @@ object Extractor extends Serializable {
 
   /**
     * 解析出用户phone，qq，微博号
+    *
     * @param arr 电信数据按分隔符分隔后的数组
     * @return 用户信息元组
     */
@@ -22,10 +23,12 @@ object Extractor extends Serializable {
 
   /**
     * 获取maimai用户的id
+    *
     * @param array 电信原始数据的数组形式
     * @return  （返回uid，ua，cookie）
     */
   def maimaiUserId(array: Array[String]): (String,String,String)  = {
+
     var info = ""
     val cookie = array(6)
     if (cookie.contains ("koa:sess=")) {
@@ -45,9 +48,450 @@ object Extractor extends Serializable {
   }
 
   /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromOtherWebsite(array: Array[String]): String = {
+
+    var info = ""
+    val cookie = array(6)
+
+    // www.189.cn
+    if (cookie.contains ("aactgsh111220=")) {
+
+      val arr = cookie.split ("aactgsh111220=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // 10jqka.com.cn
+    if (cookie.contains ("escapename=")) {
+
+      val arr = cookie.split ("escapename=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("u_name=")) {
+
+      val arr = cookie.split ("u_name=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("ths_login_uname=")) {
+
+      val arr = cookie.split ("ths_login_uname=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // email.163.com
+    if (cookie.contains ("nts_mail_user=")) {
+
+      val arr = cookie.split("nts_mail_user=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // shanghai.baixing.com
+    if (cookie.contains ("tel=")) {
+
+      val arr = cookie.split("tel=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // weidian.com
+    if (cookie.contains ("WD_b_tele=")) {
+
+      val arr = cookie.split("WD_b_tele=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // order.jd.com
+    if (cookie.contains ("unick=")) {
+
+      val arr = cookie.split("unick=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("_pst=")) {
+
+      val arr = cookie.split("_pst=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split("_p")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("pin=")) {
+
+      val arr = cookie.split("pin=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split("_p")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // item.yhd.com
+
+    if (cookie.contains ("uname=")) {
+
+      val arr = cookie.split("uname=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split("@phone")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    } else if (cookie.contains ("ac=")) {
+
+      val arr = cookie.split("ac=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // renren.com
+    if (cookie.contains ("ln_uact=")) {
+
+      val arr = cookie.split("ln_uact=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // eastmoney.com
+    if (cookie.contains ("pu=")) {
+
+      val arr = cookie.split("pu=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // kejiqi.com
+    if (cookie.contains ("DfR_guest_mobile=")) {
+
+      val arr = cookie.split("DfR_guest_mobile=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // youtx.com
+    if (cookie.contains ("autousername=")) {
+
+      val arr = cookie.split("autousername=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // jiayuan.com
+    if (cookie.contains ("save_jy_login_name=")) {
+
+      val arr = cookie.split("save_jy_login_name=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // vip.com
+    if (cookie.contains ("login_username=")) {
+
+      val arr = cookie.split("login_username=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    // music.migu.cn
+    if (cookie.contains ("USER_NAME=")) {
+
+      val arr = cookie.split("USER_NAME=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    } else if (cookie.contains ("USER_MOBILE=")) {
+
+      val arr = cookie.split("USER_MOBILE=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    info
+
+  }
+
+  /**
     * 提取用户手机号
     * @param array 电信数据按分隔符分隔后的数组
-    * @return
+    * @return 用户手机号
     */
   private def phone(array: Array[String]): String = {
 
@@ -86,6 +530,7 @@ object Extractor extends Serializable {
           }
         }
       }
+
       if (cookie.contains ("idsLoginUserIdLastTime=")) {
 
         val arr = cookie.split("idsLoginUserIdLastTime=")
@@ -151,543 +596,109 @@ object Extractor extends Serializable {
             }
           }
         }
+      }
+      // elong.com
+      if (cookie.contains ("member=")) {
 
-        // www.189.cn
-        if (cookie.contains ("aactgsh111220=")) {
+        val arr = cookie.split("member=")
 
-          val arr = cookie.split ("aactgsh111220=")
+        if (arr.length > 1) {
 
-          if (arr.length > 1) {
+          val value = arr(1).split(";")(0)
 
-            val value = arr (1).split (";")(0)
+          if (value.nonEmpty && (value forall Character.isDigit)) {
 
-            if (value.nonEmpty && (value forall Character.isDigit)) {
+            if (value.toLong.toString.length == 11) {
 
-              if (value.toLong.toString.length == 11) {
+              info = value
 
-                info = value
+              return info
 
-                return info
-
-              }
             }
           }
         }
+      }
 
-        // 10jqka.com.cn
+      // lzhe.com
+      if (cookie.contains ("LOGIN_NAME=")) {
 
-        if (cookie.contains ("escapename=")) {
+        val arr = cookie.split("LOGIN_NAME=")
 
-          val arr = cookie.split ("escapename=")
+        if (arr.length > 1) {
 
-          if (arr.length > 1) {
+          val value = arr(1).split(";")(0)
 
-            val value = arr (1).split (";")(0)
+          if (value.nonEmpty && (value forall Character.isDigit)) {
 
-            if (value.nonEmpty && (value forall Character.isDigit)) {
+            if (value.toLong.toString.length == 11) {
 
-              if (value.toLong.toString.length == 11) {
+              info = value
 
-                info = value
+              return info
 
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("u_name=")) {
-
-          val arr = cookie.split ("u_name=")
-
-          if (arr.length > 1) {
-
-            val value = arr (1).split (";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("ths_login_uname=")) {
-
-          val arr = cookie.split ("ths_login_uname=")
-
-          if (arr.length > 1) {
-
-            val value = arr (1).split (";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
             }
           }
         }
+      } else if (cookie.contains ("U_M=")) {
 
-        // email.163.com
-        if (cookie.contains ("nts_mail_user=")) {
+        val arr = cookie.split("U_M=")
 
-          val arr = cookie.split("nts_mail_user=")
+        if (arr.length > 1) {
 
-          if (arr.length > 1) {
+          val value = arr(1).split(";")(0)
 
-            val value = arr(1).split(";")(0)
+          if (value.nonEmpty && (value forall Character.isDigit)) {
 
-            if (value.nonEmpty && (value forall Character.isDigit)) {
+            if (value.toLong.toString.length == 11) {
 
-              if (value.toLong.toString.length == 11) {
+              info = value
 
-                info = value
+              return info
 
-                return info
-
-              }
             }
           }
         }
+      }
 
-        // shanghai.baixing.com
-        if (cookie.contains ("tel=")) {
+      // esf.fangdd.com
+      if (cookie.contains ("phone=")) {
 
-          val arr = cookie.split("tel=")
+        val arr = cookie.split("phone=")
 
-          if (arr.length > 1) {
+        if (arr.length > 1) {
 
-            val value = arr(1).split(";")(0)
+          val value = arr(1).split(";")(0)
 
-            if (value.nonEmpty && (value forall Character.isDigit)) {
+          if (value.nonEmpty && (value forall Character.isDigit)) {
 
-              if (value.toLong.toString.length == 11) {
+            if (value.toLong.toString.length == 11) {
 
-                info = value
+              info = value
 
-                return info
+              return info
 
-              }
             }
           }
         }
+      }
 
-        // weidian.com
-        if (cookie.contains ("WD_b_tele=")) {
+      // yougou.com
+      if (cookie.contains ("belle_username=")) {
 
-          val arr = cookie.split("WD_b_tele=")
+        val arr = cookie.split("belle_username=")
 
-          if (arr.length > 1) {
+        if (arr.length > 1) {
 
-            val value = arr(1).split(";")(0)
+          val value = arr(1).split(";")(0)
 
-            if (value.nonEmpty && (value forall Character.isDigit)) {
+          if (value.nonEmpty && (value forall Character.isDigit)) {
 
-              if (value.toLong.toString.length == 11) {
+            if (value.toLong.toString.length == 11) {
 
-                info = value
+              info = value
 
-                return info
+              return info
 
-              }
-            }
-          }
-        }
-
-        // order.jd.com
-
-        if (cookie.contains ("unick=")) {
-
-          val arr = cookie.split("unick=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("_pst=")) {
-
-          val arr = cookie.split("_pst=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split("_p")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }else if (cookie.contains ("pin=")) {
-
-          val arr = cookie.split("pin=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split("_p")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // item.yhd.com
-
-        if (cookie.contains ("uname=")) {
-
-          val arr = cookie.split("uname=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split("@phone")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("ac=")) {
-
-          val arr = cookie.split("ac=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // renren.com
-
-        if (cookie.contains ("ln_uact=")) {
-
-          val arr = cookie.split("ln_uact=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // eastmoney.com
-
-        if (cookie.contains ("pu=")) {
-
-          val arr = cookie.split("pu=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // kejiqi.com
-        if (cookie.contains ("DfR_guest_mobile=")) {
-
-          val arr = cookie.split("DfR_guest_mobile=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // youtx.com
-
-        if (cookie.contains ("autousername=")) {
-
-          val arr = cookie.split("autousername=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // jiayuan.com
-
-        if (cookie.contains ("save_jy_login_name=")) {
-
-          val arr = cookie.split("save_jy_login_name=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // vip.com
-
-        if (cookie.contains ("login_username=")) {
-
-          val arr = cookie.split("login_username=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // music.migu.cn
-        if (cookie.contains ("USER_NAME=")) {
-
-          val arr = cookie.split("USER_NAME=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("USER_MOBILE=")) {
-
-          val arr = cookie.split("USER_MOBILE=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // elong.com
-
-        if (cookie.contains ("member=")) {
-
-          val arr = cookie.split("member=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // lzhe.com
-
-        if (cookie.contains ("LOGIN_NAME=")) {
-
-          val arr = cookie.split("LOGIN_NAME=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } else if (cookie.contains ("U_M=")) {
-
-          val arr = cookie.split("U_M=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // esf.fangdd.com
-        if (cookie.contains ("phone=")) {
-
-          val arr = cookie.split("phone=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        }
-
-        // yougou.com
-
-        if (cookie.contains ("belle_username=")) {
-
-          val arr = cookie.split("belle_username=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
             }
           }
         }
@@ -698,12 +709,15 @@ object Extractor extends Serializable {
 
     }
 
+    info = phoneFromOtherWebsite(array)
+
     info
 
   }
 
   /**
     * 获取用户微博号
+    *
     * @param array  电信数据按分隔符分隔后的数组
     * @return 用户微博号
     */
@@ -753,6 +767,7 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户qq号
+    *
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户qq
     */
@@ -911,6 +926,7 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户邮箱
+    *
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户邮箱
     */
