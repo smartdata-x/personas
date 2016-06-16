@@ -4,7 +4,7 @@ import java.util.concurrent.Future
 
 import com.kunyan.userportrait.config.{PlatformConfig, SparkConfig}
 import com.kunyan.userportrait.db.{DBOperation, Table}
-import com.kunyan.userportrait.db.Table.{MaiMai, O2O}
+import com.kunyan.userportrait.db.Table.{MaiMai, WaiMai}
 import com.kunyan.userportrait.importdata.crawler.request.{KFCRequest, MaiMaiRequest, WMCRequest}
 import com.kunyan.userportrait.importdata.extractor.Extractor
 import com.kunyan.userportrait.log.PLogger
@@ -25,7 +25,6 @@ import scala.collection.mutable.ListBuffer
 object CrawlerMaiMaiTimeScheduler {
 
   val sparkConf = new SparkConf()
-    .setMaster("local")
     .setAppName("USER")
     .set("spark.serializer",SparkConfig.SPARK_SERIALIZER)
     .set("spark.kryoserializer.buffer.max",SparkConfig.SPARK_KRYOSERIALIZER_BUFFER_MAX)
@@ -35,13 +34,13 @@ object CrawlerMaiMaiTimeScheduler {
   val ssc = new StreamingContext(sc, Seconds(5))
 
   val userMaiMaiInfoList = new ListBuffer[String]()
-  val userO2OInfoList = new ListBuffer[String]()
+  val userWaiMaiInfoList = new ListBuffer[String]()
 
   val set = new mutable.HashSet[Future[mutable.HashSet[(String,mutable.HashMap[String,String])]]]()
   val setTwo = new mutable.HashSet[(String,mutable.HashMap[String,String])]()
 
   val userMaiMaiList = new ListBuffer[(MaiMai,String)]()
-  val userO2OList = new ListBuffer[(O2O,String)]()
+  val userWaiMaiList = new ListBuffer[(WaiMai,String)]()
 
   def flatMapFun(line: String): mutable.MutableList[String] = {
 
@@ -72,8 +71,8 @@ object CrawlerMaiMaiTimeScheduler {
       userMaiMaiInfoList.clear()
       userMaiMaiList.clear()
       setTwo.clear()
-      userO2OList.clear()
-      userO2OInfoList.clear()
+      userWaiMaiList.clear()
+      userWaiMaiInfoList.clear()
 
       val data = rdd.distinct()
 
@@ -110,9 +109,9 @@ object CrawlerMaiMaiTimeScheduler {
           .distinct()
           .filter(!_.contains("*"))
           .foreach { x =>
-            val o2o = getO2OMainIndex(x)
-            userO2OList.+=((o2o._1,o2o._2))
-            userO2OInfoList.+(o2o._2)
+            val o2o = getWaiMaiMainIndex(x)
+            userWaiMaiList.+=((o2o._1,o2o._2))
+            userWaiMaiInfoList.+(o2o._2)
           }
 
         /**
@@ -127,9 +126,9 @@ object CrawlerMaiMaiTimeScheduler {
           .distinct()
           .filter(!_.contains("*"))
           .foreach { x =>
-            val o2o = getO2OMainIndex(x)
-            userO2OList.+=((o2o._1,o2o._2))
-            userO2OInfoList.+(o2o._2)
+            val o2o = getWaiMaiMainIndex(x)
+            userWaiMaiList.+=((o2o._1,o2o._2))
+            userWaiMaiInfoList.+(o2o._2)
           }
 
       } catch {
@@ -172,19 +171,19 @@ object CrawlerMaiMaiTimeScheduler {
       try {
 
         PLogger.warn("O2O解析完毕，开始写入数据库..................")
-        val exist = userO2OList.filter(x => x._1.mainIndex != -1)
-        val noExist = userO2OList.filter(x => x._1.mainIndex == -1).filter(x => x._1.phone != "Nodef")
+        val exist = userWaiMaiList.filter(x => x._1.mainIndex != -1)
+        val noExist = userWaiMaiList.filter(x => x._1.mainIndex == -1).filter(x => x._1.phone != "Nodef")
         val updateMain = noExist.map(x =>(x._1.phone,"",""))
         DBOperation.batchInsert(Array("phone","qq","weibo"),updateMain)
-        DBOperation.O2OInsert(exist,PlatformConfig.KFC)
+        DBOperation.waiMaiInsert(exist,PlatformConfig.KFC)
         val newExist = noExist.map(x => {
           x._1.mainIndex = Table.isExist("phone",x._1.phone,DBOperation.connection)._1
           x
         }).filter(_._1.mainIndex != -1)
 
-        DBOperation.O2OInsert(newExist,PlatformConfig.KFC)
+        DBOperation.waiMaiInsert(newExist,PlatformConfig.KFC)
         PLogger.warn("O2O写入数据库完毕..................:" + noExist.size)
-        FileUtil.writeToFile(kfcdir,userO2OInfoList.distinct.toArray)
+        FileUtil.writeToFile(kfcdir,userWaiMaiInfoList.distinct.toArray)
         PLogger.warn("O2O写入文件完毕..................")
 
       } catch {
@@ -197,6 +196,7 @@ object CrawlerMaiMaiTimeScheduler {
 
   /**
     * 获取main_index 中的id号
+ *
     * @param map 解析好的数据map集合
     * @return  返回一个case类和数据库表对应, 格式化后用户信息字符串
     */
@@ -228,12 +228,13 @@ object CrawlerMaiMaiTimeScheduler {
 
   /**
   * 获取main_index 中的id号
+ *
   * @param info 解析好的用户信息字符串
   * @return  返回一个case类和数据库表对应, 格式化后用户信息字符串
   */
-  def getO2OMainIndex(info: String): (O2O, String) = {
+  def getWaiMaiMainIndex(info: String): (WaiMai, String) = {
 
-    var o2o: O2O = null
+    var o2o: WaiMai = null
     try {
       val arr = info.split("-->")
       val name = arr(0)
@@ -242,7 +243,7 @@ object CrawlerMaiMaiTimeScheduler {
       val address = arr(3)
       val mainIndex = Table.isExist("phone", phone, DBOperation.connection)
       val mainIndexId = mainIndex._1
-      o2o = O2O(mainIndexId, phone, email, name, address)
+      o2o = WaiMai(mainIndexId, phone, email, name, address)
     } catch {
       case e:Exception =>
     }
