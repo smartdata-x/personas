@@ -221,7 +221,7 @@ object DBOperation extends Serializable {
     * @param list 用户信息数组
     * @param typeTag o2o平台分类标签
     */
-  def WaiMaiInsert(list: ListBuffer[(WaiMai,String)], typeTag: Int): Unit = {
+  def waiMaiInsert(list: ListBuffer[(WaiMai,String)], typeTag: Int): Unit = {
 
     var ps: PreparedStatement = null
     val sql = "insert into O2O(main_index_id,phone,email,real_name,address,platform) values (?,?,?,?,?,?)"
@@ -259,7 +259,7 @@ object DBOperation extends Serializable {
     * @param list 用户信息数组
     * @param typeTag o2o平台分类标签
     */
-  def WaiMaiInsert(list: Array[(WaiMai,String)], typeTag: Int): Unit = {
+  def waiMaiInsert(list: Array[(WaiMai,String)], typeTag: Int): Unit = {
 
     var ps: PreparedStatement = null
     val sql = "insert into O2O(main_index_id,phone,email,real_name,address,platform) values (?,?,?,?,?,?)"
@@ -298,7 +298,7 @@ object DBOperation extends Serializable {
     * o2o 临时数据表更新
     * @param list 用户数据集合
     */
-  def O2OTmpInsert(list: ListBuffer[(WaiMai,String)]): Unit = {
+  def waiMaiTmpInsert(list: ListBuffer[(WaiMai,String)]): Unit = {
 
     var ps: PreparedStatement = null
     val sql = "insert into O2O_tmp (phone,email,real_name,address,platform) values (?,?,?,?,?)"
