@@ -75,20 +75,25 @@ object FileUtil {
     * @param path 文件路径
     * @return 存在true，不存在false
     */
-  private def isExist(path:String): Boolean ={
+  private def isExist(path:String): Boolean = {
+
     val file = new File(path)
     file.exists()
+
   }
 
   /**
     * 创建文件，存在的话，不做任何操作
     * @param path 文件路径
     */
-  private def createFile(path:String): Unit ={
+  private def createFile(path:String): Unit = {
+
     val file = new File(path)
-    if(!isExist(path)){
+
+    if(!isExist(path)) {
       file.createNewFile()
     }
+
   }
 
   /**
@@ -101,9 +106,11 @@ object FileUtil {
     createFile(path)
     val out = new FileOutputStream(new File(path),true)
     val writer = new PrintWriter(out, false)
-    for (arr <- array){
+
+    for (arr <- array) {
       writer.append(arr + "\n")
     }
+
     writer.flush()
     writer.close()
   }

@@ -90,8 +90,11 @@ object StringUtil {
     * @author youchaojiang
     */
   def urlDecode(string: String): String = {
+
     val decoder  = URLDecoder.decode(string,"utf-8")
+
     decoder
+
   }
 
   /**
@@ -104,12 +107,16 @@ object StringUtil {
     if(compressedStr == null) {
       return null
     }
+
     val bos = new ByteArrayOutputStream()
     val  zos = new InflaterOutputStream(bos)
+
     try {
       zos.write(new sun.misc.BASE64Decoder().decodeBuffer(compressedStr))
     } catch {
+
       case e:Exception => e.printStackTrace()
+
     } finally {
 
       if(zos != null ) {
@@ -131,8 +138,11 @@ object StringUtil {
     * @author youchaojiang
     */
   private def getJsonObject(line:String): JSONObject = {
+
     val data = new JSONObject(line)
+
     data
+
   }
 
   /**
@@ -164,10 +174,14 @@ object StringUtil {
       finalValue = ts + "\t" + ad + "\t" + ua + "\t" + host +"\t"+ url + "\t" + ref + "\t" +cookie + "\t" + keyword
 
     } catch {
+
       case e:Exception  =>
         PLogger.warn("error parse JSONObject")
+
     }
+
     finalValue
+
   }
 
   /**
@@ -176,6 +190,8 @@ object StringUtil {
     * @author youchaojiang
     */
   def getMaimaiUserId(line:String) : String = {
+
     getJsonObject(decodeBase64(line)).get("u").toString
+
   }
 }
