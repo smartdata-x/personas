@@ -23,7 +23,6 @@ object DBOperation extends Serializable {
 
   /**
     * 数据插入到 main_index
- *
     * @param columns 列名
     * @param iterator 需插入的数据迭代器
     */
@@ -58,7 +57,6 @@ object DBOperation extends Serializable {
 
   /**
     * 数据更新到 main_index
- *
     * @param columns 列名
     * @param iterator 需更新的数据迭代器
     */
@@ -95,7 +93,6 @@ object DBOperation extends Serializable {
 
   /**
     * 插入和main_index 表中手机号码有关联的数据
- *
     * @param list 与数据库personas中maimai表对应的case类
     */
   def maiMaiInsert(list: ListBuffer[(MaiMai,String)]): Unit = {
@@ -138,7 +135,6 @@ object DBOperation extends Serializable {
 
   /**
     * 插入和main_index 表中手机号码有关联的数据
- *
     * @param arr 与数据库personas中maimai表对应的case类
     */
   def maiMaiInsert(arr: Array[(MaiMai,String)]): Unit = {
@@ -181,7 +177,6 @@ object DBOperation extends Serializable {
 
   /**
     * 插入与main_index 表没有手机号码关联的数据
- *
     * @param list 与数据库personas中maimai_tmp表对应的case类
     */
   def maiMaiTempInsert(list: ListBuffer[(MaiMai,String)]): Unit = {
@@ -223,7 +218,6 @@ object DBOperation extends Serializable {
 
   /**
     * o2o 平台数据的更新
- *
     * @param list 用户信息数组
     * @param typeTag o2o平台分类标签
     */
@@ -262,7 +256,6 @@ object DBOperation extends Serializable {
 
   /**
     * o2o 平台数据的更新
- *
     * @param list 用户信息数组
     * @param typeTag o2o平台分类标签
     */
@@ -303,7 +296,6 @@ object DBOperation extends Serializable {
 
   /**
     * o2o 临时数据表更新
- *
     * @param list 用户数据集合
     */
   def O2OTmpInsert(list: ListBuffer[(WaiMai,String)]): Unit = {
@@ -363,7 +355,7 @@ object DBOperation extends Serializable {
 
       PLogger.warn("count:" + res.count())
       var index = 1
-      val userPhone = res.foreach { row =>
+      res.foreach { row =>
         PLogger.warn("index:"+ index)
         index += 1
         val phone = row._1.toString
