@@ -29,20 +29,31 @@ object Extractor extends Serializable {
 
     var info = ""
     val cookie = array(6)
+
     if (cookie.contains ("koa:sess=")) {
+
       try {
+
         val arr = cookie.split ("koa:sess=")
+
         if (arr.length > 1) {
+
           val value = arr(1).split(";")(0)
+
           if (value.nonEmpty) {
             info = StringUtil.getMaimaiUserId(value)
           }
+
         }
       } catch {
+
         case e:Exception => PLogger.warn("maimai userid error")
+
       }
     }
+
     (info,array(2),array(6))
+
   }
 
   /**
@@ -783,11 +794,11 @@ object Extractor extends Serializable {
           val d = cookie.substring(name + 5).split(";")(0)
           val decode = StringUtil.urlDecode(d).split("&")(0)
 
-          if (decode.contains("%40qq.com")){
+          if (decode.contains("%40qq.com")) {
 
             val tempInfo = decode.replace("%40qq.com", "")
 
-            if(tempInfo forall Character.isDigit){
+            if(tempInfo forall Character.isDigit) {
 
               return tempInfo
 
@@ -805,13 +816,13 @@ object Extractor extends Serializable {
 
       if (arr.length > 1) {
 
-        if(arr(1).contains(";")){
+        if(arr(1).contains(";")) {
 
           info = arr(1).split(";")(0)
 
           return  info
 
-        }else{
+        } else{
 
           info = arr(1)
 
@@ -819,6 +830,7 @@ object Extractor extends Serializable {
 
         }
       }
+
     } else if (cookie.contains("qzone_check=")) {
 
       val arr = cookie.split("qzone_check=")
@@ -830,22 +842,23 @@ object Extractor extends Serializable {
         return  info
 
       }
-    } else if(cookie.contains("pt2gguin=o")){
+
+    } else if(cookie.contains("pt2gguin=o")) {
 
       val arr = cookie.split("pt2gguin=o")
 
       if (arr.length > 1) {
 
-        if(arr(1).contains(";")){
+        if(arr(1).contains(";")) {
 
           info = arr(1).split(";")(0)
 
-        }else{
+        } else{
 
           info = arr(1)
 
         }
-        if(info.nonEmpty){
+        if(info.nonEmpty) {
 
           info = info.toLong.toString
 
@@ -855,7 +868,7 @@ object Extractor extends Serializable {
       }
     }
     // dian ping
-    if(cookie.contains("ua=")){
+    if(cookie.contains("ua=")) {
 
       try {
 
@@ -911,13 +924,16 @@ object Extractor extends Serializable {
             }
           }
         }
+
       } catch {
 
         case e:Exception => PLogger.warn("kfc qq error")
 
       }
     }
+
     info
+
   }
 
   /**
@@ -955,6 +971,7 @@ object Extractor extends Serializable {
 
       })
     }
+
     if(cookie.contains("idsLoginUserIdLastTime=")) {
 
       val template = "(?<=idsLoginUserIdLastTime=)\\w+%40\\w+\\.com".r
@@ -968,6 +985,8 @@ object Extractor extends Serializable {
 
       })
     }
+
     info
+
   }
 }
