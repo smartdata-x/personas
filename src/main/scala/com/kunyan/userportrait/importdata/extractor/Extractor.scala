@@ -29,20 +29,30 @@ object Extractor extends Serializable {
 
     var info = ""
     val cookie = array(6)
+
     if (cookie.contains ("koa:sess=")) {
+
       try {
+
         val arr = cookie.split ("koa:sess=")
+
         if (arr.length > 1) {
+
           val value = arr(1).split(";")(0)
+
           if (value.nonEmpty) {
             info = StringUtil.getMaimaiUserId(value)
           }
         }
       } catch {
+
         case e:Exception => PLogger.warn("maimai userid error")
+
       }
     }
+
     (info,array(2),array(6))
+
   }
 
   /**
