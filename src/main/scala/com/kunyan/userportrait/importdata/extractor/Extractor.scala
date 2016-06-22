@@ -60,19 +60,168 @@ object Extractor extends Serializable {
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户手机号
     */
-  private def phoneFromOtherWebsite(array: Array[String]): String = {
+  private def phoneFromWebsiteSeven(array: Array[String]): String = {
+
+    var info = ""
+    val cookie = array(6)
+    if (cookie.contains("cSaveState=")) {
+
+      val template = "(?<=cSaveState=)\\d{11}".r
+      val resultPhone = template.findAllMatchIn (cookie)
+
+      resultPhone.foreach (x => {
+
+        info = x.toString
+
+        return info
+
+      })
+    } else if (cookie.contains("un=")) {
+
+      val arr = cookie.split("un=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split(";")(0)
+
+        if (value forall Character.isDigit) {
+
+          info = value
+
+          return info
+
+        }
+      }
+    }
+
+    if (cookie.contains ("idsLoginUserIdLastTime=")) {
+
+      val arr = cookie.split("idsLoginUserIdLastTime=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value forall Character.isDigit) {
+
+          info = value
+
+          return info
+
+        }
+      }
+    }
+
+    // 点评获取用户手机
+    if (cookie.contains("ua=")) {
+
+      try {
+
+        val arr = cookie.split("ua=")
+
+        if (arr.length > 1) {
+
+          val value = arr(1).split(";")(0)
+
+          if (value.nonEmpty && (value forall Character.isDigit)) {
+
+            if (value.toLong.toString.length == 11) {
+
+              info = value
+
+              return info
+
+            }
+          }
+        }
+      } catch {
+        case e:Exception => PLogger.warn("dian ping phone error")
+      }
+    }
+    // kfc 获取用户手机
+    if (cookie.contains("yum_ueserInfo=")) {
+
+      val arr = cookie.split("yum_ueserInfo=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+    // elong.com
+    if (cookie.contains ("member=")) {
+
+      val arr = cookie.split("member=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    info
+
+  }
+
+  /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteTwo(array: Array[String]): String = {
 
     var info = ""
     val cookie = array(6)
 
-    // www.189.cn
-    if (cookie.contains ("aactgsh111220=")) {
+    // lzhe.com
+    if (cookie.contains ("LOGIN_NAME=")) {
 
-      val arr = cookie.split ("aactgsh111220=")
+      val arr = cookie.split("LOGIN_NAME=")
 
       if (arr.length > 1) {
 
-        val value = arr (1).split (";")(0)
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    } else if (cookie.contains ("U_M=")) {
+
+      val arr = cookie.split("U_M=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
 
         if (value.nonEmpty && (value forall Character.isDigit)) {
 
@@ -86,55 +235,14 @@ object Extractor extends Serializable {
         }
       }
     }
+    // esf.fangdd.com
+    if (cookie.contains ("phone=")) {
 
-    // 10jqka.com.cn
-    if (cookie.contains ("escapename=")) {
-
-      val arr = cookie.split ("escapename=")
-
-      if (arr.length > 1) {
-
-        val value = arr (1).split (";")(0)
-
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-
-    } else if (cookie.contains ("u_name=")) {
-
-      val arr = cookie.split ("u_name=")
+      val arr = cookie.split("phone=")
 
       if (arr.length > 1) {
 
-        val value = arr (1).split (";")(0)
-
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-
-    } else if (cookie.contains ("ths_login_uname=")) {
-
-      val arr = cookie.split ("ths_login_uname=")
-
-      if (arr.length > 1) {
-
-        val value = arr (1).split (";")(0)
+        val value = arr(1).split(";")(0)
 
         if (value.nonEmpty && (value forall Character.isDigit)) {
 
@@ -148,11 +256,10 @@ object Extractor extends Serializable {
         }
       }
     }
+    // yougou.com
+    if (cookie.contains ("belle_username=")) {
 
-    // email.163.com
-    if (cookie.contains ("nts_mail_user=")) {
-
-      val arr = cookie.split("nts_mail_user=")
+      val arr = cookie.split("belle_username=")
 
       if (arr.length > 1) {
 
@@ -171,49 +278,18 @@ object Extractor extends Serializable {
       }
     }
 
-    // shanghai.baixing.com
-    if (cookie.contains ("tel=")) {
+    info
+  }
 
-      val arr = cookie.split("tel=")
+  /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteThree(array: Array[String]): String = {
 
-      if (arr.length > 1) {
-
-        val value = arr(1).split(";")(0)
-
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-    }
-
-    // weidian.com
-    if (cookie.contains ("WD_b_tele=")) {
-
-      val arr = cookie.split("WD_b_tele=")
-
-      if (arr.length > 1) {
-
-        val value = arr(1).split(";")(0)
-
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-    }
+    var info = ""
+    val cookie = array(6)
 
     // order.jd.com
     if (cookie.contains ("unick=")) {
@@ -277,30 +353,24 @@ object Extractor extends Serializable {
       }
     }
 
-    // item.yhd.com
+    info
 
-    if (cookie.contains ("uname=")) {
+  }
 
-      val arr = cookie.split("uname=")
+  /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteFour(array: Array[String]): String = {
 
-      if (arr.length > 1) {
+    var info = ""
+    val cookie = array(6)
 
-        val value = arr(1).split("@phone")(0)
+    // email.163.com
+    if (cookie.contains ("nts_mail_user=")) {
 
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-    } else if (cookie.contains ("ac=")) {
-
-      val arr = cookie.split("ac=")
+      val arr = cookie.split("nts_mail_user=")
 
       if (arr.length > 1) {
 
@@ -318,11 +388,10 @@ object Extractor extends Serializable {
         }
       }
     }
+    // shanghai.baixing.com
+    if (cookie.contains ("tel=")) {
 
-    // renren.com
-    if (cookie.contains ("ln_uact=")) {
-
-      val arr = cookie.split("ln_uact=")
+      val arr = cookie.split("tel=")
 
       if (arr.length > 1) {
 
@@ -362,7 +431,6 @@ object Extractor extends Serializable {
         }
       }
     }
-
     // kejiqi.com
     if (cookie.contains ("DfR_guest_mobile=")) {
 
@@ -384,7 +452,6 @@ object Extractor extends Serializable {
         }
       }
     }
-
     // youtx.com
     if (cookie.contains ("autousername=")) {
 
@@ -407,27 +474,19 @@ object Extractor extends Serializable {
       }
     }
 
-    // jiayuan.com
-    if (cookie.contains ("save_jy_login_name=")) {
+    info
 
-      val arr = cookie.split("save_jy_login_name=")
+  }
 
-      if (arr.length > 1) {
+  /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteFive(array: Array[String]): String = {
 
-        val value = arr(1).split(";")(0)
-
-        if (value.nonEmpty && (value forall Character.isDigit)) {
-
-          if (value.toLong.toString.length == 11) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-    }
+    var info = ""
+    val cookie = array(6)
 
     // vip.com
     if (cookie.contains ("login_username=")) {
@@ -450,7 +509,6 @@ object Extractor extends Serializable {
         }
       }
     }
-
     // music.migu.cn
     if (cookie.contains ("USER_NAME=")) {
 
@@ -497,6 +555,221 @@ object Extractor extends Serializable {
   }
 
   /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteSix(array: Array[String]): String = {
+
+    var info = ""
+    val cookie = array(6)
+
+    // weidian.com
+    if (cookie.contains ("WD_b_tele=")) {
+
+      val arr = cookie.split("WD_b_tele=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+    // item.yhd.com
+    if (cookie.contains ("uname=")) {
+
+      val arr = cookie.split("uname=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split("@phone")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    } else if (cookie.contains ("ac=")) {
+
+      val arr = cookie.split("ac=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+    // renren.com
+    if (cookie.contains ("ln_uact=")) {
+
+      val arr = cookie.split("ln_uact=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    info
+
+  }
+
+  /**
+    * 通过其他网站提取用户手机号
+    * @param array 电信数据按分隔符分隔后的数组
+    * @return 用户手机号
+    */
+  private def phoneFromWebsiteOne(array: Array[String]): String = {
+
+    var info = ""
+    val cookie = array(6)
+
+    // www.189.cn
+    if (cookie.contains ("aactgsh111220=")) {
+
+      val arr = cookie.split ("aactgsh111220=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+    // 10jqka.com.cn
+    if (cookie.contains ("escapename=")) {
+
+      val arr = cookie.split ("escapename=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("u_name=")) {
+
+      val arr = cookie.split ("u_name=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+
+    } else if (cookie.contains ("ths_login_uname=")) {
+
+      val arr = cookie.split ("ths_login_uname=")
+
+      if (arr.length > 1) {
+
+        val value = arr (1).split (";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+    // jiayuan.com
+    if (cookie.contains ("save_jy_login_name=")) {
+
+      val arr = cookie.split("save_jy_login_name=")
+
+      if (arr.length > 1) {
+
+        val value = arr(1).split(";")(0)
+
+        if (value.nonEmpty && (value forall Character.isDigit)) {
+
+          if (value.toLong.toString.length == 11) {
+
+            info = value
+
+            return info
+
+          }
+        }
+      }
+    }
+
+    info
+
+  }
+
+  /**
     * 提取用户手机号
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户手机号
@@ -507,217 +780,25 @@ object Extractor extends Serializable {
 
     try {
 
-      val cookie = array(6)
+      val infoOne = phoneFromWebsiteOne(array)
+      val infoTwo = phoneFromWebsiteTwo(array)
+      val infoThree = phoneFromWebsiteThree(array)
+      val  infoFour = phoneFromWebsiteFour(array)
+      val infoFive = phoneFromWebsiteFive(array)
+      val infoSix = phoneFromWebsiteSix(array)
+      val infoSeven = phoneFromWebsiteSeven(array)
 
-      if (cookie.contains("cSaveState=")) {
+      val infoArray = Array(infoOne, infoTwo, infoThree, infoFour, infoFive, infoSix, infoSeven).filter(_.nonEmpty)
 
-        val template = "(?<=cSaveState=)\\d{11}".r
-        val resultPhone = template.findAllMatchIn (cookie)
-
-        resultPhone.foreach (x => {
-
-          info = x.toString
-
-          return info
-
-        })
-      } else if (cookie.contains("un=")) {
-
-        val arr = cookie.split("un=")
-
-        if (arr.length > 1) {
-
-          val value = arr (1).split(";")(0)
-
-          if (value forall Character.isDigit) {
-
-            info = value
-
-            return info
-
-          }
-        }
+      if(infoArray.length == 1) {
+        info = infoArray(0)
       }
 
-      if (cookie.contains ("idsLoginUserIdLastTime=")) {
-
-        val arr = cookie.split("idsLoginUserIdLastTime=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value forall Character.isDigit) {
-
-            info = value
-
-            return info
-
-          }
-        }
-      }
-
-      // 点评获取用户手机
-      if (cookie.contains("ua=")) {
-
-        try {
-
-          val arr = cookie.split("ua=")
-
-          if (arr.length > 1) {
-
-            val value = arr(1).split(";")(0)
-
-            if (value.nonEmpty && (value forall Character.isDigit)) {
-
-              if (value.toLong.toString.length == 11) {
-
-                info = value
-
-                return info
-
-              }
-            }
-          }
-        } catch {
-          case e:Exception => PLogger.warn("dian ping phone error")
-        }
-      }
-
-      // kfc 获取用户手机
-      if (cookie.contains("yum_ueserInfo=")) {
-
-        val arr = cookie.split("yum_ueserInfo=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      }
-      // elong.com
-      if (cookie.contains ("member=")) {
-
-        val arr = cookie.split("member=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      }
-
-      // lzhe.com
-      if (cookie.contains ("LOGIN_NAME=")) {
-
-        val arr = cookie.split("LOGIN_NAME=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      } else if (cookie.contains ("U_M=")) {
-
-        val arr = cookie.split("U_M=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      }
-
-      // esf.fangdd.com
-      if (cookie.contains ("phone=")) {
-
-        val arr = cookie.split("phone=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      }
-
-      // yougou.com
-      if (cookie.contains ("belle_username=")) {
-
-        val arr = cookie.split("belle_username=")
-
-        if (arr.length > 1) {
-
-          val value = arr(1).split(";")(0)
-
-          if (value.nonEmpty && (value forall Character.isDigit)) {
-
-            if (value.toLong.toString.length == 11) {
-
-              info = value
-
-              return info
-
-            }
-          }
-        }
-      }
     } catch {
 
       case e:Exception => PLogger.warn("phone extractor error")
 
     }
-
-    info = phoneFromOtherWebsite(array)
 
     info
 
@@ -809,6 +890,7 @@ object Extractor extends Serializable {
         case e:Exception => PLogger.warn("qq url decode error")
 
       }
+
     } else if (cookie.contains("o_cookie=")) {
 
       val arr = cookie.split("o_cookie=")
@@ -829,6 +911,7 @@ object Extractor extends Serializable {
 
         }
       }
+
     } else if (cookie.contains("qzone_check=")) {
 
       val arr = cookie.split("qzone_check=")
@@ -840,6 +923,7 @@ object Extractor extends Serializable {
         return  info
 
       }
+
     } else if(cookie.contains("pt2gguin=o")){
 
       val arr = cookie.split("pt2gguin=o")
@@ -888,6 +972,7 @@ object Extractor extends Serializable {
             }
           }
         }
+
       } catch {
 
         case e:Exception => PLogger.warn("dian ping qq error")
@@ -895,9 +980,7 @@ object Extractor extends Serializable {
       }
     }
 
-    /**
-      * kfc 获取用户qq
-      */
+    // kfc 获取用户qq
     if(cookie.contains("yum_ueserInfo=")) {
 
       try {
@@ -921,13 +1004,16 @@ object Extractor extends Serializable {
             }
           }
         }
+
       } catch {
 
         case e:Exception => PLogger.warn("kfc qq error")
 
       }
     }
+
     info
+
   }
 
   /**
