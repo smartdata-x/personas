@@ -7,6 +7,7 @@ import com.kunyan.userportrait.db.{DBOperation, Table}
 import com.kunyan.userportrait.db.Table.MaiMai
 import com.kunyan.userportrait.importdata.crawler.request.MaiMaiRequest
 import com.kunyan.userportrait.importdata.crawler.task.MaiMaiSubTask
+import com.kunyan.userportrait.importdata.extractor.Extractor
 import com.kunyan.userportrait.log.PLogger
 import com.kunyan.userportrait.util.FileUtil
 import org.apache.spark.sql.SQLContext
