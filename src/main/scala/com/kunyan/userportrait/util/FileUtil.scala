@@ -39,6 +39,11 @@ object FileUtil {
     }
   }
 
+  /**
+    * 创建文件
+    * @param path 文件路径
+    * @param array  文件内容数组
+    */
   def createFile(path: String,array:Array[String]): Unit = {
 
     val writer = new PrintWriter(path, "UTF-8")
@@ -63,6 +68,51 @@ object FileUtil {
     }
     mkDir(destPath)
     createFile(destPath +"/"+TimeUtil.getCurrentHour,filter)
+  }
+
+  /**
+    * 判断是否存在文件
+    * @param path 文件路径
+    * @return 存在true，不存在false
+    */
+  private def isExist(path:String): Boolean = {
+
+    val file = new File(path)
+    file.exists()
+
+  }
+
+  /**
+    * 创建文件，存在的话，不做任何操作
+    * @param path 文件路径
+    */
+  private def createFile(path:String): Unit = {
+
+    val file = new File(path)
+
+    if(!isExist(path)) {
+      file.createNewFile()
+    }
+
+  }
+
+  /**
+    * 保存数据到文件中
+    * @param path 文件的路径
+    * @param array 内容数组
+    */
+  def writeToFile(path: String, array:Array[String]): Unit = {
+
+    createFile(path)
+    val out = new FileOutputStream(new File(path),true)
+    val writer = new PrintWriter(out, false)
+
+    for (arr <- array) {
+      writer.append(arr + "\n")
+    }
+
+    writer.flush()
+    writer.close()
   }
 
 }
