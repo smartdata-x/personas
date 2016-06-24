@@ -196,7 +196,6 @@ object CrawlerMaiMaiTimeScheduler {
 
   /**
     * 获取main_index 中的id号
- *
     * @param map 解析好的数据map集合
     * @return  返回一个case类和数据库表对应, 格式化后用户信息字符串
     */
@@ -228,7 +227,6 @@ object CrawlerMaiMaiTimeScheduler {
 
   /**
   * 获取main_index 中的id号
- *
   * @param info 解析好的用户信息字符串
   * @return  返回一个case类和数据库表对应, 格式化后用户信息字符串
   */
