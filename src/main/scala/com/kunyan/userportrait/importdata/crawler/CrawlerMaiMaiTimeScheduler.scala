@@ -42,6 +42,11 @@ object CrawlerMaiMaiTimeScheduler {
   val userMaiMaiList = new ListBuffer[(MaiMai,String)]()
   val userWaiMaiList = new ListBuffer[(WaiMai,String)]()
 
+  /**
+    * 接收实时数据，并解析
+    * @param line 源数据
+    * @return 返回解析后的数据
+    */
   def flatMapFun(line: String): mutable.MutableList[String] = {
 
     val lineList: mutable.MutableList[String] = mutable.MutableList[String]()
@@ -54,6 +59,7 @@ object CrawlerMaiMaiTimeScheduler {
     lineList
 
   }
+
   def main(args: Array[String]) {
 
 
