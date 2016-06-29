@@ -17,9 +17,11 @@ object MeiTuanRequest extends Request {
     var res = ""
 
     try {
+
       if(cookie.nonEmpty){
         res = sendRequest(ua,url,cookie)
       }
+
     } catch {
       case exception: SocketTimeoutException =>  PLogger.warn("requestForUserInfo time out")
       case exception: Exception => PLogger.warn("requestForUserInfo exception")

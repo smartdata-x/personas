@@ -1,5 +1,6 @@
 package com.kunyan.userportrait.importdata.crawler.parser
 
+import com.kunyan.userportrait.log.PLogger
 import org.jsoup.Jsoup
 
 import scala.collection.mutable
@@ -39,18 +40,21 @@ object MeiTuanParser {
 
         }
       }
+
       if(name.nonEmpty) {
         infoMap.+=(("姓名", name))
       }
+
       if(address.nonEmpty) {
         infoMap.+=(("地址", address))
       }
+
       if(phone.nonEmpty) {
         infoMap.+=(("手机号", phone))
       }
 
     } catch {
-      case e:Exception =>
+      case e:Exception => PLogger.exception(e)
     } finally {
 
       infoMap.foreach { x =>
@@ -60,7 +64,7 @@ object MeiTuanParser {
 
         if(info.nonEmpty) {
           info = info + "\t" + key + ":" + value
-        }else {
+        } else {
           info = key + ":"+ value
         }
       }

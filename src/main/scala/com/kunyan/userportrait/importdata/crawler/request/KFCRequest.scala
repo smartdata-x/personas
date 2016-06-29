@@ -108,7 +108,7 @@ object KFCRequest extends  Request {
 
       }
     } catch  {
-      case e:Exception =>
+      case e:Exception => PLogger.exception(e)
     }
 
     info = name + "-->" + phone + "-->" + email + "-->" + address

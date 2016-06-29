@@ -17,6 +17,7 @@ class  MeiTuanTask(ua: String, cookie: String) extends Callable[(String,mutable.
     val set = new mutable.HashSet[(String, mutable.HashMap[String,String])]()
     PLogger.warn("Thread:" + Thread.currentThread().getName + ",activeCount:"+Thread.activeCount() + ",getId:"+Thread.currentThread().getId)
     val info = MeiTuanRequest.sendMeiTuanRequest(ua, cookie)
+
     info
 
   }

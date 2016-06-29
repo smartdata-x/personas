@@ -77,6 +77,7 @@ object CrawlerMaiMaiTimeScheduler {
       val data = rdd.distinct()
 
       try {
+
         PLogger.warn("start maimai extract user info:")
         val userInfo = data.map(_.split("\t"))
           .filter(_.length == 8)
@@ -97,9 +98,8 @@ object CrawlerMaiMaiTimeScheduler {
             })
           }
         }
-        /**
-          * kfc 数据提取
-          */
+
+        // kfc 数据提取
         PLogger.warn("start kfc extract user info:")
         val kfcUserInfo = data.map(_.split("\t"))
           .filter(_.length == 8)
@@ -114,9 +114,7 @@ object CrawlerMaiMaiTimeScheduler {
             userWaiMaiInfoList.+(o2o._2)
           }
 
-        /**
-          * waimaichaoren 数据提取
-          */
+        // waimaichaoren 数据提取
         PLogger.warn("start waimaichaoren extract user info:")
         val wmcrUserInfo = data.map(_.split("\t"))
           .filter(_.length == 8)
@@ -136,6 +134,7 @@ object CrawlerMaiMaiTimeScheduler {
       }
 
       PLogger.warn("set2.size：" + setTwo.size)
+
       try {
 
         PLogger.warn("解析完毕，开始写入数据库..................")
@@ -165,7 +164,6 @@ object CrawlerMaiMaiTimeScheduler {
 
       } catch {
         case e: Exception => PLogger.warn(e.getMessage)
-      } finally {
       }
 
       try {
@@ -176,6 +174,7 @@ object CrawlerMaiMaiTimeScheduler {
         val updateMain = noExist.map(x =>(x._1.phone,"",""))
         DBOperation.batchInsert(Array("phone","qq","weibo"),updateMain)
         DBOperation.waiMaiInsert(exist,PlatformConfig.KFC)
+
         val newExist = noExist.map(x => {
           x._1.mainIndex = Table.isExist("phone",x._1.phone,DBOperation.connection)._1
           x
@@ -190,8 +189,10 @@ object CrawlerMaiMaiTimeScheduler {
         case e: Exception => PLogger.warn(e.getMessage)
       }
     }
+
     ssc.start()
     ssc.awaitTermination()
+
   }
 
   /**
@@ -217,6 +218,7 @@ object CrawlerMaiMaiTimeScheduler {
     if(address == "Nodef") {
       address = if(map.contains("地区")) map.get("地区").get else ""
     }
+
     val maimai = MaiMai(mainIndexId,phone,email,job,position,realName,company,education,address)
     maiMai = maimai
     info = realName + "\t" + phone +  "\t" + email +  "\t" +  position +  "\t" + job +  "\t" + address +  "\t" + company +  "\t" + education
@@ -233,7 +235,9 @@ object CrawlerMaiMaiTimeScheduler {
   def getWaiMaiMainIndex(info: String): (WaiMai, String) = {
 
     var o2o: WaiMai = null
+
     try {
+
       val arr = info.split("-->")
       val name = arr(0)
       val phone = if (arr(1) != "Nodef") arr(1) else "Nodef"
@@ -242,6 +246,7 @@ object CrawlerMaiMaiTimeScheduler {
       val mainIndex = Table.isExist("phone", phone, DBOperation.connection)
       val mainIndexId = mainIndex._1
       o2o = WaiMai(mainIndexId, phone, email, name, address)
+
     } catch {
       case e:Exception =>
     }
