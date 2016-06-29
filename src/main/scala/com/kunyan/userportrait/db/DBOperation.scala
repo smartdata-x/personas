@@ -298,7 +298,7 @@ object DBOperation extends Serializable {
     * o2o 临时数据表更新
     * @param list 用户数据集合
     */
-  def O2OTmpInsert(list: ListBuffer[(WaiMai,String)]): Unit = {
+  def waiMaiTmpInsert(list: ListBuffer[(WaiMai,String)]): Unit = {
 
     var ps: PreparedStatement = null
     val sql = "insert into O2O_tmp (phone,email,real_name,address,platform) values (?,?,?,?,?)"
@@ -355,7 +355,7 @@ object DBOperation extends Serializable {
 
       PLogger.warn("count:" + res.count())
       var index = 1
-      val userPhone = res.foreach { row =>
+      res.foreach { row =>
         PLogger.warn("index:"+ index)
         index += 1
         val phone = row._1.toString
