@@ -21,7 +21,7 @@ import scala.io.Source
  */
 object WeiBo {
 
-  var Cookies = new ListBuffer[String]
+  var cookies = new ListBuffer[String]
 
   /**
    *
@@ -29,7 +29,7 @@ object WeiBo {
    */
   def crawlWeiBoInfo(data: ListBuffer[(String, String)], outFile: String): Unit = {
 
-    Cookies = getCookies
+    cookies = getCookies
 
     //获取微博用户信息
     val weiBoInfo = getWeiBoInfo(data)
@@ -64,7 +64,7 @@ object WeiBo {
   def getCookieMap: util.HashMap[String, String] = {
 
     val cookieMap = new util.HashMap[String, String]()
-    val cookieStr = Cookies((Math.random() * Cookies.size).toInt)
+    val cookieStr = cookies((Math.random() * cookies.size).toInt)
     val cookieArr = cookieStr.split(";")
 
     for (line <- cookieArr) {
