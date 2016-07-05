@@ -12,14 +12,14 @@ import scala.collection.mutable
   */
 object MeiTuanRequest extends Request {
 
-  def requestForUserInfo(url:String,ua:String,cookie:String): String = {
+  def requestForUserInfo(url:String, ua:String, cookie:String): String = {
 
     var res = ""
 
     try {
 
       if(cookie.nonEmpty){
-        res = sendRequest(ua,url,cookie)
+        res = sendRequest(ua, url, cookie)
       }
 
     } catch {

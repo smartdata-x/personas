@@ -350,7 +350,6 @@ object Extractor extends Serializable {
 
   /**
     * 获取用户邮箱
-    *
     * @param array 电信数据按分隔符分隔后的数组
     * @return 用户邮箱
     */

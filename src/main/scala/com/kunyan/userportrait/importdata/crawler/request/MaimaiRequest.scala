@@ -28,7 +28,7 @@ object MaiMaiRequest  extends  Request {
     try {
 
       if(cookie.nonEmpty) {
-        res = sendRequest(ua,url,cookie)
+        res = sendRequest(ua, url, cookie)
       }
 
     } catch {
@@ -79,12 +79,16 @@ object MaiMaiRequest  extends  Request {
           res = sendRequest(ua,url,cookie)
           val ids = MaiMaiParser.extractorMaiMaiUid(res)
 
-          if(ids.nonEmpty){
+          if(ids.nonEmpty) {
             uidHashSet.++=(ids)
           }
+
         }
+
         index += 15
+
       }
+
     } catch {
 
       case exception: HttpStatusException => PLogger.warn("contact list fetch over")

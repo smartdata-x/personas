@@ -66,8 +66,8 @@ object WMCRequest extends  Request {
 
     if (m.find()) {
 
-      val infos = m.group().split("\\(")(1)
-      val jo = new JSONObject(infos)
+      val infoArray = m.group().split("\\(")(1)
+      val jo = new JSONObject(infoArray)
       name = jo.getString("customer_name")
       address = jo.getString("delivery_address")
       phone = jo.getString("customer_phone")

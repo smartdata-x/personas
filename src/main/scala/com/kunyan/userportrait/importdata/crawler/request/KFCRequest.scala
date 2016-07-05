@@ -107,6 +107,7 @@ object KFCRequest extends  Request {
         address = addArr(addArr.length - 1).replace("&nbsp;", "").replace(" ", "").trim
 
       }
+
     } catch  {
       case e:Exception => PLogger.exception(e)
     }
