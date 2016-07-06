@@ -142,57 +142,23 @@ object CrawlerMaiMaiScheduler {
     var info = ""
     var maiMai:MaiMai = null
     var phone = "Nodef"
-    var email = ""
-    var job = ""
-    var position = ""
-    var realName = ""
-    var company = ""
-    var education = ""
-    var address = "Nodef"
+    val email = map.getOrElse("邮箱", "")
+    val job = map.getOrElse("工作", "")
+    val position = map.getOrElse("职位", "")
+    val realName = map.getOrElse("姓名", "")
+    val company = map.getOrElse("工作经历", "")
+    val education = map.getOrElse("教育经历", "")
+    var address = map.getOrElse("地址", "Nodef")
 
-    if(map.contains("手机号") && !map.get("手机号").get.contains("提升好友级别可见")) {
+    if(map.contains("手机号") && !map.get("手机号").get.contains("好友级别可见")) {
       phone = map.get("手机号").get
     }
 
     val mainIndex = Table.isExist("phone", phone, DBOperation.connection)
     val mainIndexId = mainIndex._1
 
-    if(map.contains("邮箱")) {
-      email = map.get("邮箱").get
-    }
-
-    if(map.contains("工作")) {
-      job = map.get("工作").get
-    }
-
-    if(map.contains("职位")) {
-      position = map.get("职位").get
-    }
-
-    if(map.contains("姓名")) {
-      realName = map.get("姓名").get
-    }
-
-    if(map.contains("工作经历")) {
-      company = map.get("工作经历").get
-    }
-
-    if(map.contains("教育经历")) {
-      education  = map.get("教育经历").get
-    }
-
-    if(map.contains("地址")) {
-      address = map.get("地址").get
-    }
-
     if(address == "Nodef") {
-
-      if(map.contains("地区")) {
-        address = map.get("地区").get
-      } else {
-        address = ""
-      }
-
+      address = map.getOrElse("地区", "")
     }
 
     maiMai =  MaiMai(mainIndexId, phone, email, job, position, realName, company, education, address)

@@ -11,6 +11,7 @@ import com.kunyan.userportrait.log.PLogger
 import com.kunyan.userportrait.util.{FileUtil, StringUtil}
 import kafka.serializer.StringDecoder
 import org.apache.spark.SparkConf
+import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
@@ -38,6 +39,29 @@ object CrawlerMaiMaiTimeScheduler {
 
   val userMaiMaiList = new ListBuffer[(MaiMai,String)]()
   val userWaiMaiList = new ListBuffer[(WaiMai,String)]()
+
+  /**
+    * 指定条件解析源数据
+    * @param data 源数据
+    * @param url 过滤的url
+    * @param function 用于解析源数据提取信息的函数
+    */
+  def dataExtractor(data: RDD[String], url: String, function: Array[String] => String): Unit = {
+
+    data.map(_.split("\t"))
+      .filter(_.length == 8)
+      .filter(x => x(6) != "NoDef")
+      .filter(x => x(3).contains(url))
+      .map(function)
+      .distinct()
+      .filter(!_.contains("*"))
+      .foreach { x =>
+        val o2o = getWaiMaiMainIndex(x)
+        userWaiMaiList.+=((o2o._1, o2o._2))
+        userWaiMaiInfoList.+(o2o._2)
+      }
+
+  }
 
   /**
     * 接收实时数据，并解析
@@ -104,33 +128,12 @@ object CrawlerMaiMaiTimeScheduler {
 
         // kfc 数据提取
         PLogger.warn("start kfc extract user info:")
-        data.map(_.split("\t"))
-          .filter(_.length == 8)
-          .filter(x => x(6) != "NoDef")
-          .filter(x => x(3).contains("4008823823.com.cn"))
-          .map(KFCRequest.crawlerKfc)
-          .distinct()
-          .filter(!_.contains("*"))
-          .foreach { x =>
-            val o2o = getWaiMaiMainIndex(x)
-            userWaiMaiList.+=((o2o._1, o2o._2))
-            userWaiMaiInfoList.+(o2o._2)
-          }
+        dataExtractor(data, "4008823823.com.cn", KFCRequest.crawlerKfc)
 
         // waiMaiCaoRen 数据提取
         PLogger.warn("start waiMaiCaoRen extract user info:")
-        data.map(_.split("\t"))
-          .filter(_.length == 8)
-          .filter(x => x(6) != "NoDef")
-          .filter(x => x(3).contains("waimaichaoren.com"))
-          .map(WMCRequest.crawlerWMCR)
-          .distinct()
-          .filter(!_.contains("*"))
-          .foreach { x =>
-            val o2o = getWaiMaiMainIndex(x)
-            userWaiMaiList.+=((o2o._1, o2o._2))
-            userWaiMaiInfoList.+(o2o._2)
-          }
+        dataExtractor(data, "waimaichaoren.com", WMCRequest.crawlerWMCR)
+
 
       } catch {
         case e: Exception => PLogger.warn(e.getMessage)
@@ -208,57 +211,23 @@ object CrawlerMaiMaiTimeScheduler {
     var info = ""
     var maiMai:MaiMai = null
     var phone = "Nodef"
-    var email = ""
-    var job = ""
-    var position = ""
-    var realName = ""
-    var company = ""
-    var education = ""
-    var address = "Nodef"
+    val email = map.getOrElse("邮箱", "")
+    val job = map.getOrElse("工作", "")
+    val position = map.getOrElse("职位", "")
+    val realName = map.getOrElse("姓名", "")
+    val company = map.getOrElse("工作经历", "")
+    val education = map.getOrElse("教育经历", "")
+    var address = map.getOrElse("地址", "Nodef")
 
-    if(map.contains("手机号") && !map.get("手机号").get.contains("提升好友级别可见")) {
+    if(map.contains("手机号") && !map.get("手机号").get.contains("好友级别可见")) {
       phone = map.get("手机号").get
     }
 
     val mainIndex = Table.isExist("phone", phone, DBOperation.connection)
     val mainIndexId = mainIndex._1
 
-    if(map.contains("邮箱")) {
-      email = map.get("邮箱").get
-    }
-
-    if(map.contains("工作")) {
-      job = map.get("工作").get
-    }
-
-    if(map.contains("职位")) {
-      position = map.get("职位").get
-    }
-
-    if(map.contains("姓名")) {
-      realName = map.get("姓名").get
-    }
-
-    if(map.contains("工作经历")) {
-      company = map.get("工作经历").get
-    }
-
-    if(map.contains("教育经历")) {
-      education  = map.get("教育经历").get
-    }
-
-    if(map.contains("地址")) {
-      address = map.get("地址").get
-    }
-
     if(address == "Nodef") {
-
-      if(map.contains("地区")) {
-        address = map.get("地区").get
-      } else {
-        address = ""
-      }
-
+      address = map.getOrElse("地区", "")
     }
 
     maiMai =  MaiMai(mainIndexId, phone, email, job, position, realName, company, education, address)
