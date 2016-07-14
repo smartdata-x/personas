@@ -10,7 +10,8 @@ import scala.collection.mutable
   * Created by C.J.YOU on 2016/5/30.
   * 请求数据单个任务
   */
-class MaiMaiSubRunable (uid: String, ua: String, cookie: String) extends Callable[(String,mutable.HashMap[String, String])] {
+class MaiMaiSubRunable (uid: String, ua: String, cookie: String)
+  extends Callable[(String,mutable.HashMap[String, String])] {
 
   override def call(): (String, mutable.HashMap[String, String]) = {
 
