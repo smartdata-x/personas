@@ -50,6 +50,8 @@ libraryDependencies += "org.json" % "json" % "20140107"
 
 libraryDependencies += "org.apache.spark" % "spark-streaming_2.10" % "1.5.2"
 
+libraryDependencies += "org.apache.spark" % "spark-graphx_2.10" % "1.5.2"
+
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
   case PathList("javax", "activation", xs @ _*) => MergeStrategy.last
