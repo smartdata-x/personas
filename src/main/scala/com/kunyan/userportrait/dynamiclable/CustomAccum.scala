@@ -8,7 +8,7 @@
 #    Date         : 2016-05-27 10:36
 #    Description  : 
 =============================================================================*/
-package com.kunyan.wokongsvc.userportrait
+package com.kunyan.userportrait.dynamiclable
 
 import org.apache.spark.Accumulator
 import org.apache.spark.AccumulatorParam

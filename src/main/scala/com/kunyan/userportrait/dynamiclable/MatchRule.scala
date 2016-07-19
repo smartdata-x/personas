@@ -1,11 +1,11 @@
 /*************************
  * Copyright @ 2015 ShanghaiKunyan. All rights reserved
- * @filename : /opt/spark-1.2.2-bin-hadoop2.4/work/spark/LabelScala/src/main/scala/com/kunyan/dynamiclabel/UserFilter.scala
+ * @filename : /opt/spark-1.2.2-bin-hadoop2.4/work/spark/LabelScala/src/main/scala/com/kunyan/dynamiclabel/MatchRule.scala
  * @author   : Sunsolo
  * Email     : wukun@kunyan-inc.com
  * Date      : 2016-07-11 18:32
  **************************************/
-package com.kunyan.wokongsvc.userportrait
+package com.kunyan.userportrait.dynamiclable
 
 import Recursion._
 
@@ -90,12 +90,12 @@ object MatchRule {
    * 时间戳: 访问筛选URL时的时间戳
    */
   def matchUrl(
-    elem: Tuple2[String, Tuple2[List[String], List[String]]])
+    elem: Tuple2[String, Tuple2[List[String], List[String]]]
     ): Boolean = {
 
       elem._2._1.exists( y => {
         ((y.toDouble - 1000 * 60 * 1) <= (elem._2._2)(2).toDouble) && ((elem._2._2)(2).toDouble <= (y.toDouble + 1000 * 60 *5))
       })
 
-    }
+  }
 }
