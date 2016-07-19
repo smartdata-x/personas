@@ -8,7 +8,7 @@
 #    Date         : 2016-05-17 12:41
 #    Description  : 
 =============================================================================*/
-package com.kunyan.wokongsvc.userportrait
+package com.kunyan.userportrait.dynamiclable
 
 import org.apache.spark.rdd.RDD
 

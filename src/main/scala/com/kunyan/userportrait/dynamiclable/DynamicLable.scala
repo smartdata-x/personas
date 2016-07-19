@@ -5,7 +5,7 @@
  * Email     : wukun@kunyan-inc.com
  * Date      : 2016-07-10 18:32
  **************************************/
-package com.kunyan.wokongsvc.userportrait
+package com.kunyan.userportrait.dynamiclable
 
 import MatchRule._
 import Recursion._
