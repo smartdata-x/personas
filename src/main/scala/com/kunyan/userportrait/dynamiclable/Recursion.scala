@@ -10,6 +10,8 @@
 =============================================================================*/
 package com.kunyan.userportrait.dynamiclable
 
+import com.kunyan.userportrait.dynamiclable.MatchRule.matchUrl
+
 import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.HashMap
