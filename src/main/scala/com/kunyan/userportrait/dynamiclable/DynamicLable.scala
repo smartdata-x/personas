@@ -7,11 +7,10 @@
  **************************************/
 package com.kunyan.wokongsvc.userportrait
 
-import Recursion._
 import MatchRule._
+import Recursion._
 
 import org.apache.spark.graphx._
-import org.apache.spark.graphx.VertexId
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
@@ -51,8 +50,6 @@ object DynamicLable {
      **/
     var userCountByWeek: RDD[(String, Int)] = null
 
-    //****val misMatchs = ArrayBuffer[ArrayRDDList]()
-
     val eachDayRules = new ArrayRDDList()
 
 
@@ -70,7 +67,12 @@ object DynamicLable {
 
       for( j <- 0 to hours) {
 
-        val originData = ctx.textFile("/user/wukun/data/teleData_" + i + "/" + j).distinct.filter( x => {
+        val fileName = "/user/wukun/data/teleData_" + i + "/" + j
+
+        // 查找hdfs的默认块大小命令为：hdfs dfs -stat "%o" /user/wukun/data/teleData_0/0
+        // textFile读取文件形成的RDD的分区数为文件的hdfs块数,在57.12上的块大小为134217728B
+        // 当数据不够2个块大小时，则默认值为2，当数据为空时，则默认值为1
+        val originData = ctx.textFile(fileName).distinct.filter( x => {
           val elem = x.split("\t")
           elem.size >= 8
         }).map( x => {
@@ -85,6 +87,7 @@ object DynamicLable {
           ((elem(0), elem(1)), List[String](elem(3), elem(4), elem(5)))
         })
 
+        // 像什么 filter, map等转换操作不会改变分区数
         val matchRecord = originData.filter(ruleUrlData(_, ruleUrl)).map( x => {
           /**
             * 时间戳，用户ID，本次访问URL的主机，本次访问URL的主机后的部分
@@ -114,15 +117,13 @@ object DynamicLable {
 
         mismatchRecord.saveAsObjectFile("/user/wukun/misMatch/" + i + "/" + j)
 
-        // misMatch += mismatchRecord
-
         /* 根据键为标准, 组合不同的时间戳 */
         // (用户ID， 时间戳列表)
         val idToTimeList = matchRecord.map(x => (x._1._2, x._1._1)).combineByKey(
           (v : String) => List(v),
           (c : List[String], v : String) => v :: c,
           (c1: List[String], c2: List[String]) => c1:::c2
-        )
+        ).coalesce(matchRecord.partitions.length / 5 + 1)
 
         /* 用户每天的数据：格式为用户ID：时间戳列表 */
         if(idToTimeListByDay == null) {
@@ -131,6 +132,9 @@ object DynamicLable {
 
         } else {
 
+          // 在到达unio之前的分区数都没有改变，当然union也没有改变单个RDD的分区数，它只是将所有的分区数整合到一起
+          // 因为单个task是和单个partition对应的，所以partiton越多task也就越多，当然为了达到一定的平行度这样做是可以的。
+          // 但当单个task任务数据量太少时，就会产生过多的任务，导致提交次数太多
           idToTimeListByDay = idToTimeListByDay.union(idToTimeList).combineByKey(
             (v : List[String]) => v,
             (c : List[String], v : List[String]) => v ::: c,
@@ -140,12 +144,15 @@ object DynamicLable {
         }
       }
 
-      //****misMatchs += misMatch
+      // 在上面idToTimeListByDay将一天中24小时内的RDD全整合到一起，分区数是逐渐累加的
+
       // 到这个位置有misMatchs, userCount缓存(可以看得出容量比较大)  ********
 
       /**
         * 用户首先要满足每天的访问次数大于某一阈值 
         */
+      idToTimeListByDay = idToTimeListByDay.coalesce(idToTimeListByDay.partitions.length / 8 + 1)
+
       val tmp = idToTimeListByDay.filter(x => x._2.size > dayThreshold).cache
       tmp.saveAsObjectFile("/user/wukun/eachDayRule/" + i)
 
@@ -157,15 +164,23 @@ object DynamicLable {
       if(userCountByWeek == null) {
         userCountByWeek = userCountByDay
       } else {
+        // userCountByWeek是将所有天数下面的小时里的所有RDD的分区进行了累加
         userCountByWeek = userCountByWeek.union(userCountByDay).reduceByKey( _ + _)
       }
+
     }
     // 到这个位置有misMatchs, eachDayRules, userCountByWeek会被缓存(可以看得出容量比较大)  ********
 
     /**
       * 根据一周出现的次数，筛选合适的user 
       */
+    // userCountByWeek(用户ID, 出现次数)
+    // standUserByWeek同上
+    // standUserByWeek同userCountByWeek的分区数是一样的
+
+    userCountByWeek = userCountByWeek.coalesce(userCountByWeek.partitions.length / 3 + 1)
     var standUserByWeek = userCountByWeek.filter(x => x._2 >= weekThreshold)
+
     userCountByWeek = null
     // 到这个位置有misMatchs, eachDayRules, standardUser会被缓存(可以看得出容量比较大)    *******
 
@@ -177,15 +192,18 @@ object DynamicLable {
       */
     for( i <- 0 to days) {
 
+      // 当saveAsObjectFile保存以后，再从文件里读取后，分区数是不变的
       val standUserByDay = ctx.objectFile[(String, List[String])]("/user/wukun/eachDayRule/" + i)
 
       for( j <- 0 to hours) {
 
         val mismatchRecord = ctx.objectFile[(String, List[String])]("/user/wukun/misMatch/" + i + "/" + j)
+        // join后的分区数是和调用join这个接口的RDD分区数一样的
         val standUser = standUserByWeek.join(standUserByDay).map( x => {
           (x._1, x._2._2)
         })
 
+        // mismatchRecord用户ID，本次URL的HOST，上级URL，时间戳
         standUser.join(mismatchRecord).filter(matchUrl(_)).map( x => {
           /* 源url, 目的url */
           (x._2._2(1), x._2._2(0))
@@ -197,8 +215,6 @@ object DynamicLable {
 
     standUserByWeek = null
 
-    //*****val misUrlAndRefs = misUrlWeek(standardUser, eachDayRules, misMatchs, days, hours)
-
     /* url(准备进行pagerank) */
     var extendUrl: RDD[String] = null
 
@@ -206,6 +222,7 @@ object DynamicLable {
 
       for( j <- 0 to hours ) {
 
+        // 在下面misHourUrl指定的文件里，一个文件是99个分区, 99 * 48 = 4752, 这样分区多，产生大量的临时对象，造成垃圾回收困难
         val extendUrlByHour = ctx.objectFile[(String, String)]("/user/wukun/misHourUrl/" + i + "/" + j).map( x => x._2).distinct
 
         if(extendUrl == null) {
@@ -213,13 +230,14 @@ object DynamicLable {
         } else {
           extendUrl = (extendUrl ++ extendUrlByHour).distinct
         }
+
       }
+      extendUrl = extendUrl.coalesce(extendUrl.partitions.length / 7 + 1)
     }
 
-    //*****val extendUrl = extUrlWeek(misUrlAndRefs, days, hours)
     // 到这个位置有misUrlAndRefs, extendUrl被缓存(可以看得出容量比较大)    *********
 
-    var id:Int = 0
+    var id: Int = 0
 
     /**
       * 给扩展的URL添加标识，以数字为标识
@@ -265,7 +283,6 @@ object DynamicLable {
     //val graph = Graph.fromEdges[Int, Int](origin, 0)
 
     val ranks = graph.pageRank(accu).vertices
-    ranks.top(20)(Ordering.by[(VertexId, Double),Double](_._2)).mkString("\n")
   }
 }
 
