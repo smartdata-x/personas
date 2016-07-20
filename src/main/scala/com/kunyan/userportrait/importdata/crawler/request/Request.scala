@@ -23,6 +23,7 @@ class Request {
     var ipPort: Array[String] = null
 
     try {
+
       val doc = Jsoup.connect("http://qsdrk.daili666api.com/ip/?tid=558465838696598&num=500&delay=5&foreign=none&ports=80,8080")
         .timeout(3000)
         .followRedirects(true)
@@ -60,7 +61,7 @@ class Request {
       System.getProperties.setProperty("http.proxyPort", port)
 
     } catch {
-      case e:Exception => PLogger.warn("changIP error")
+      case e: Exception => PLogger.warn("changIP error")
     }
 
   }
@@ -81,6 +82,7 @@ class Request {
       if (lineArr.length > 1) {
         cookieMap.put(lineArr(0), lineArr(1))
       }
+
     }
 
     cookieMap
@@ -99,6 +101,7 @@ class Request {
     var res = ""
 
     try {
+
       val response = Jsoup.connect(url)
         .ignoreContentType(true)
         .userAgent(ua)
@@ -111,7 +114,8 @@ class Request {
 
     } catch {
 
-      case exception: SocketTimeoutException => changIP()
+      case exception: SocketTimeoutException =>
+        changIP()
         PLogger.warn("sendRequest time out")
       case exception: HttpStatusException => PLogger.warn("HttpStatusException out")
       case exception: Exception => PLogger.warn("sendRequest time out")
