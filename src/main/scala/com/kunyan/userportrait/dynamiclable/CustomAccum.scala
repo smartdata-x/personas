@@ -46,7 +46,7 @@ object CustomAccum {
           for(innerKey <- innerKeys) {
 
             if(t1(outerKey).contains(innerKey)) {
-              t1(outerKey)(innerKey) = t1(outerKey)(innerKey) + t2(outerKey)(innerKey)
+              t1(outerKey)(innerKey) += t2(outerKey)(innerKey)
             }
 
           }

@@ -16,23 +16,23 @@ import scala.xml._
   * Created by wukun on 2016/5/23
   * xml操作句柄
   */
-class XmlHandle private(val xmlPath:String) extends Serializable {
+class XmlHandle private(val xmlPath: String) extends Serializable {
 
   val xmlConfig = loadXml()
 
-  def loadXml():Elem = {
+  def loadXml(): Elem = {
     XML.loadFile(xmlPath)
   }
 
-  def getElem(elemName:String):String = {
+  def getElem(elemName: String): String = {
     (xmlConfig\elemName).text
   }
   
-  def getElem(firstName:String, secondName:String):String = {
+  def getElem(firstName: String, secondName: String): String = {
     (xmlConfig\firstName\secondName).text
   }
 
-  override def toString():String = {
+  override def toString(): String = {
     this.xmlPath
   }
 }
@@ -43,14 +43,14 @@ class XmlHandle private(val xmlPath:String) extends Serializable {
   */
 object XmlHandle {
 
-  var xmlHandle:XmlHandle = _
+  var xmlHandle: XmlHandle = _
 
   /**
     * 获取全局唯一的操作句柄实例
     * @param xmlPath 路径
     * @author wukun
     */
-  def apply(xmlPath:String):XmlHandle = {
+  def apply(xmlPath: String): XmlHandle = {
 
     if(xmlHandle == null) {
       xmlHandle = new XmlHandle(xmlPath)

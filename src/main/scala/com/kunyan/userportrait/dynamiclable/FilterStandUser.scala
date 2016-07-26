@@ -18,8 +18,15 @@ object FilterStandUser {
 
   def main(args: Array[String]) {
 
-    val xmlHandle = XmlHandle("./config.xml")
+    val xmlHandle = XmlHandle(args(0))
     val suc = StandUserContext(xmlHandle)
+
+    val userCount = suc.accum[Int](0)
+    val standUrl = suc.standUrl
+    val standUrlBroad = suc.broadcast[Array[String]](standUrl)
+
+    val dayThreshold = suc.dayThreshold
+    val weekThreshold = suc.weekThreshold
 
     var matchUserByWeek: RDD[(String, Int)] = null
 
@@ -32,6 +39,7 @@ object FilterStandUser {
         val originData = suc.generateRdd(i, j).filter( x => {
 
           val elem = x.split("\t")
+          println(elem)
           elem.size >= 8
 
         }).map( x => {
@@ -42,36 +50,95 @@ object FilterStandUser {
         })
 
         val matchUserByHour = originData
-          .filter(ruleUrlData(_, suc.standUrl))
-          .map( x => (x._1, 1))
-          .reduceByKey(_ + _)
+          .mapPartitions( x => {
+
+            val standUrl = standUrlBroad.value
+            x.filter(ruleUrlData(_, standUrl))
+
+          }).map( x => {
+            (x._1, 1)
+          }).reduceByKey(_ + _)
 
         if(matchUserByDay == null) {
           matchUserByDay = matchUserByHour
         } else {
 
-          matchUserByDay = matchUserByDay.groupWith(matchUserByHour).map( x => {
-            (x._1, x._2._1.size + x._2._2.size)
+          matchUserByDay = matchUserByDay
+            .groupWith(matchUserByHour)
+            .map( x => {
+
+              val value1 = {
+
+                if(x._2._1.size != 0) {
+                  x._2._1.head
+                } else {
+                  0
+                }
+
+              }
+
+              val value2 = {
+
+                if(x._2._2.size != 0) {
+                  x._2._2.head
+                } else {
+                  0
+                }
+
+              }
+
+              (x._1, value1 + value2)
           })
 
         }
+
+
       }
 
       if(matchUserByWeek == null) {
-        matchUserByWeek = matchUserByDay.filter( x => x._2 > suc.dayThreshold)
+        matchUserByWeek = matchUserByDay
+          .filter( x => {
+            x._2 >= dayThreshold
+          })
       } else {
 
         matchUserByWeek = matchUserByWeek
-          .groupWith(matchUserByDay.filter( x => x._2 >= suc.dayThreshold))
-          .map( x => (x._1, x._2._1.size + x._2._2.size))
+          .groupWith(matchUserByDay.filter( x => x._2 >= dayThreshold))
+          .map( x => {
 
+            val value1 = {
+
+              if(x._2._1.size != 0) {
+                x._2._1.head
+              } else {
+                0
+              }
+
+            }
+
+            val value2 = {
+
+              if(x._2._2.size != 0) {
+                x._2._2.head
+              } else {
+                0
+              }
+
+            }
+
+            (x._1, value1 + value2)
+          })
       }
+
     }
 
     val standUser = matchUserByWeek.filter( x => {
-      x._2 >= suc.weekThreshold
+
+      x._2 >= weekThreshold
+
+    }).foreach( x => {
+      userCount += 1
     })
   }
 }
-
 

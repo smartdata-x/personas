@@ -10,18 +10,18 @@
 =============================================================================*/
 package com.kunyan.userportrait.dynamiclable
 
-import com.kunyan.userportrait.dynamiclable.MatchRule.matchUrl
+import MatchRule._
 
 import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.HashMap
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable
 
 object Recursion {
 
   type Tuple2List = Tuple2[(String, String), List[String]]
-  type ArrayRDDList = ArrayBuffer[RDD[(String, List[String])]]
-  type ArrayRDD = ArrayBuffer[RDD[(String, String)]]
+  type ArrayRDDList = mutable.ArrayBuffer[RDD[(String, List[String])]]
+  type ArrayRDD = mutable.ArrayBuffer[RDD[(String, String)]]
 
   /**
     * @param ruleUrl 匹配的每天规则url
@@ -31,7 +31,7 @@ object Recursion {
     /* user_id和时间戳列表, 时间戳用来做选择扩充url的基准 */
     ruleUrl: RDD[(String, List[String])], 
     /* 每一维一天 */
-    misMatch: ArrayBuffer[ArrayRDDList], 
+    misMatch: mutable.ArrayBuffer[ArrayRDDList], 
     out: Int, 
     in: Int): ArrayRDD = {
 
@@ -43,7 +43,10 @@ object Recursion {
 
     } else {
 
-      misUrlDay(ruleUrl, misMatch, out, in - 1) += ruleUrl.join(misMatch(out)(in)).filter(matchUrl(_)).map( x => 
+      misUrlDay(ruleUrl, misMatch, out, in - 1) += ruleUrl
+        .join(misMatch(out)(in))
+        .filter(matchUrl(_))
+        .map( x => 
           (x._2._2(1), x._2._2(0)))
 
     }
@@ -54,9 +57,9 @@ object Recursion {
     userRule: RDD[(String, Int)], 
     /* user_id和时间戳列表 */
     dayRules: ArrayRDDList, 
-    mis: ArrayBuffer[ArrayRDDList], 
+    mis: mutable.ArrayBuffer[ArrayRDDList], 
     out: Int, 
-    in: Int): ArrayBuffer[ArrayRDD] = {
+    in: Int): mutable.ArrayBuffer[ArrayRDD] = {
 
     if(out == 0) {
 
@@ -65,7 +68,7 @@ object Recursion {
         (x._1, x._2._2)
       })
 
-      ArrayBuffer[ArrayRDD]() += misUrlDay(rule, mis, 0, in)
+      mutable.ArrayBuffer[ArrayRDD]() += misUrlDay(rule, mis, 0, in)
 
     } else {
 
@@ -78,7 +81,7 @@ object Recursion {
   }
 
   def extUrlDay(
-    urlRef: ArrayBuffer[ArrayRDD], 
+    urlRef: mutable.ArrayBuffer[ArrayRDD], 
     out: Int, 
     in: Int): RDD[String] = {
 
@@ -94,7 +97,7 @@ object Recursion {
   }
 
   def extUrlWeek(
-    urlRef: ArrayBuffer[ArrayRDD], 
+    urlRef: mutable.ArrayBuffer[ArrayRDD], 
     out: Int, 
     in: Int): RDD[String] = {
 
