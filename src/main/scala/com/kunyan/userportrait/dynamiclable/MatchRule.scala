@@ -23,21 +23,21 @@ object MatchRule {
     * @author wukun
     */
   def ruleUrlData(
-    elem: Tuple2List, 
+    elem: (String, String, String),
     url: Array[String]): Boolean = {
 
-    if((elem._1)._2.contains(".") == true) {
+    if(elem._1.contains(".") == true) {
       false
     } else {
 
-      if((elem._2)(0).compareTo("www.news.cn") == 0) {
-        (elem._2)(1).startsWith("/fortune")
-      } else if((elem._2)(0).compareTo("moer.jiemian.com") == 0) {
-        (elem._2)(1).startsWith("/investment_findPageList.htm?onColumns=TZGD_HUSHEN&industrys=all&fieldColumn=all&price=free&authorType=1&sortType=time")
+      if(elem._2.compareTo("www.news.cn") == 0) {
+        elem._3.startsWith("/fortune")
+      } else if(elem._2.compareTo("moer.jiemian.com") == 0) {
+        elem._3.startsWith("/investment_findPageList.htm?onColumns=TZGD_HUSHEN&industrys=all&fieldColumn=all&price=free&authorType=1&sortType=time")
       } else {
 
         url.exists(y => {
-          if((elem._2)(0).compareTo(y) == 0) true else false
+          if(elem._2.compareTo(y) == 0) true else false
         })
 
       }
