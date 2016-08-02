@@ -6,7 +6,7 @@ version := "1.0"
 
 scalaVersion := "2.10.4"
 
-resolvers += "Kunyan Repo" at "http://222.73.34.92:8081/nexus/content/groups/public/"
+resolvers += "Kunyan Repo" at "http://61.147.80.227:8081/nexus/content/groups/public/"
 
 libraryDependencies += "org.jsoup" % "jsoup" % "1.8.3"
 
