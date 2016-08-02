@@ -4,6 +4,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by lcm on 2016/3/28.
+ * 此类用于获取奢侈品用户的信息
  */
 object RichManInfo {
 

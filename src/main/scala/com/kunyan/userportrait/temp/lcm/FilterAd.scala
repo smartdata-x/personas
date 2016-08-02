@@ -9,6 +9,7 @@ import scala.io.Source
 
 /**
  * Created by lcm on 2016/3/23.
+ * 此类用于过滤股票和奢侈品用户的ad
  */
 object FilterAd {
 
