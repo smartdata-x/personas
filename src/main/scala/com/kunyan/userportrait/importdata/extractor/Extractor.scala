@@ -428,7 +428,7 @@ object Extractor extends Serializable {
       }
     }
 
-    (info,array(1),array(2),array(6))
+    (info, array(1), array(2), array(6))
 
   }
 

@@ -91,7 +91,14 @@ object MaiMainLinkScheduler {
 
   }
 
-
+  /**
+    * 指定条件解析源数据
+    * @param rdd 源数据集合
+    * @param url 过滤url
+    * @param formatFunction 统一装换为实时数据标准格式
+    * @param filterFunction 过滤数据
+    * @return 结果数据集
+    */
   def dataExtractor(rdd: RDD[String], url: String, formatFunction:Array[String] => String, filterFunction: Array[String] => (String,String,String,String)): Array[ (String,String,String,String)] = {
 
     val result = rdd.map(_.split("\t"))
