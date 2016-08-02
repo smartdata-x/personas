@@ -194,4 +194,59 @@ object StringUtil {
     getJsonObject(decodeBase64(line)).get("u").toString
 
   }
+
+  /**
+    * 统一个格式化电信数据成上海实时数据的标准形式
+    * @param arr 原始数据格式
+    * @return 标准化后
+    * @author youchaojiang
+    */
+  def dataFormat(arr: Array[String]) = {
+
+    val ts = arr(2)
+    val ad = arr(1)
+    val ua = if(arr(5) != "NoDef") StringUtil.decodeBase64(arr(5)) else arr(5)
+
+    val (url,index) = if(arr(3).startsWith("http")) {
+
+      val third = arr(3).replace("https://","").replace("http://","")
+      val url = third.split("/")(0)
+      var index = ""
+
+      if(third.split("/").length > 1) {
+        index = third.split("/")(1)
+      }
+
+      if(index.isEmpty) {
+        index = "NoDef"
+      }
+
+      (url,index)
+
+    } else {
+
+      val url = arr(3).split("/")(0)
+      var index = ""
+
+      if(arr(3).split("/").length > 1) {
+        index = arr(3).split("/")(1)
+      }
+
+      if(index.isEmpty) {
+        index = "NoDef"
+      }
+
+      (url,index)
+
+    }
+
+    val ref = if(arr(4) != "NoDef") StringUtil.decodeBase64(arr(4)) else arr(4)
+
+    val cookie = if(arr(7) != "NoDef") StringUtil.decodeBase64(arr(7)) else arr(7)
+
+    ts + "\t" + ad + "\t" + ua + "\t" + url+ "\t" + index+ "\t" + ref+ "\t" + cookie + "\t" + "NoDef"
+
+  }
+
+
 }
