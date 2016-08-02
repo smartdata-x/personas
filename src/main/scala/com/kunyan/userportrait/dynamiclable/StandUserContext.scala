@@ -7,10 +7,15 @@
 ***********************************************************************************************/
 package com.kunyan.userportrait.dynamiclable
 
+import org.apache.spark.Accumulator 
+import org.apache.spark.AccumulatorParam
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.storage.StorageLevel
+import org.apache.spark.broadcast.Broadcast
+import scala.reflect.ClassTag
+
 import scala.io.Source
 import scala.util.matching.Regex
 
@@ -54,6 +59,14 @@ class StandUserContext(val xmlHandle: XmlHandle) {
     sc.textFile(fileName).distinct
   }
 
+  def accum[T](initialValue: T)(implicit param: AccumulatorParam[T]): Accumulator[T] = {
+    sc.accumulator[T](initialValue)
+  }
+
+  def broadcast[T: ClassTag](source: T): Broadcast[T] = {
+    sc.broadcast[T](source)
+  }
+
 }
 
 /**
@@ -87,6 +100,3 @@ object StandUserContext {
     println(suc.dataDays + ":" + suc.dataHours + ":" + suc.dayThreshold + ":" + suc.weekThreshold)
   }
 }
-
-
-
