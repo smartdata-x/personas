@@ -2,6 +2,7 @@ package com.kunyan.userportrait.importdata.extractor
 
 import com.kunyan.userportrait.log.PLogger
 import com.kunyan.userportrait.util.StringUtil
+
 import scala.util.control.Breaks._
 
 /**
@@ -398,4 +399,37 @@ object Extractor extends Serializable {
     }
     info
   }
+
+  /**
+    * 获取脉脉的uid
+    * @param array 电信原始数据的数组形式
+    * @return  （返回uid，ad, ua, cookie）
+    */
+  def maimaiDataLink(array: Array[String]): (String,String,String,String)  = {
+
+    var info = ""
+    val cookie = array(6)
+    if (cookie.contains ("koa:sess=")) {
+
+      try {
+
+        val arr = cookie.split ("koa:sess=")
+
+        if (arr.length > 1) {
+
+          val value = arr(1).split(";")(0)
+
+          if (value.nonEmpty) {
+            info = StringUtil.getMaimaiUserId(value)
+          }
+        }
+      } catch {
+        case e:Exception => println("maimai userid error")
+      }
+    }
+
+    (info,array(1),array(2),array(6))
+
+  }
+
 }
