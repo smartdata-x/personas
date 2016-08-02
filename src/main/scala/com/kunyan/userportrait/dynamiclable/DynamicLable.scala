@@ -88,7 +88,7 @@ object DynamicLable {
         })
 
         // 像什么 filter, map等转换操作不会改变分区数
-        val matchRecord = originData.filter(ruleUrlData(_, ruleUrl)).map( x => {
+        val matchRecord = originData.filter(elem => ruleUrlData((elem._1._2, (elem._2)(0), (elem._2)(1)), ruleUrl)).map( x => {
           /**
             * 时间戳，用户ID，本次访问URL的主机，本次访问URL的主机后的部分
             **/
