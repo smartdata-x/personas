@@ -1,4 +1,4 @@
-mainClass in (Compile, packageBin) := Some("com.kunyan.userportrait.temp.ys.CombineResult")
+mainClass in (Compile, packageBin) := Some("com.kunyan.userportrait.Test")
 
 name := "personas"
 
@@ -51,6 +51,8 @@ libraryDependencies += "org.json" % "json" % "20140107"
 libraryDependencies += "org.apache.spark" % "spark-streaming_2.10" % "1.5.2"
 
 libraryDependencies += "org.apache.spark" % "spark-graphx_2.10" % "1.5.2"
+
+libraryDependencies += "com.ibm.icu" % "icu4j" % "56.1"
 
 assemblyMergeStrategy in assembly := {
   case PathList("javax", "servlet", xs @ _*) => MergeStrategy.last
